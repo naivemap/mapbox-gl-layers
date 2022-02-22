@@ -1,0 +1,1 @@
+# vite-lib-template

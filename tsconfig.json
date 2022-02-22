@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "outDir": "./dist",
+    "strict": true,
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": []
+}
