@@ -1,15 +1,99 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>vite lib</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-  </head>
-  <body>
-    <script type="module">
-      import { test } from './src/index.ts'
 
-      test()
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <title>vite lib</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+
+<body>
+  <div id='map' style='position: absolute; top: 0; right: 0;bottom: 0;left: 0;'></div>
+  <script type="module">
+    import EchartsLayer from "./src/index.ts";
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaHVhbmdsaWkiLCJhIjoiY2ptbjJsZXRsMHBlNzNsbGIycTk3eWU0biJ9.Pj_8_ER8nD7UQSSeOg4JZA';
+    const map = new mapboxgl.Map({
+      container: 'map', // container ID
+      style: 'mapbox://styles/mapbox/streets-v11', // style URL
+      center :  [109.08052, 36.04231],
+      zoom   :  2,
+    });
+
+    map.on('load', ()=>{
+      const data = [
+        { name: '海门', value: 9 },
+        { name: '鄂尔多斯', value: 12 },
+        { name: '招远', value: 12 },
+        { name: '舟山', value: 12 },
+        { name: '齐齐哈尔', value: 14 },
+        { name: '盐城', value: 15 },
+      ];
+      const geoCoordMap = {
+        海门: [121.15, 31.89],
+        鄂尔多斯: [109.781327, 39.608266],
+        招远: [120.38, 37.35],
+        舟山: [122.207216, 29.985295],
+        齐齐哈尔: [123.97, 47.33],
+        盐城: [120.13, 33.38],
+      };
+      const convertData = function (data) {
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+          var geoCoord = geoCoordMap[data[i].name];
+          if (geoCoord) {
+            res.push({
+              name: data[i].name,
+              value: geoCoord.concat(data[i].value)
+            });
+          }
+        }
+        return res;
+      };
+      const option = {
+        title: {
+          text: '全国主要城市空气质量 - 百度地图',
+          subtext: 'data from PM25.in',
+          sublink: 'http://www.pm25.in',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item'
+        },
+        series: [
+          {
+            name: 'pm2.5',
+            type: 'scatter',
+            // coordinateSystem: 'bmap',
+            data: convertData(data),
+            symbolSize: function (val) {
+              return val[2];
+            },
+            encode: {
+              value: 2
+            },
+            label: {
+              formatter: '{b}',
+              position: 'right',
+              show: false
+            },
+            emphasis: {
+              label: {
+                show: true
+              }
+            }
+          },
+        ]
+      };
+
+   
+      const layer = new EchartsLayer('EE', option)
+      map.addLayer(layer)
+    })
+
+  </script>
+</body>
+
 </html>
