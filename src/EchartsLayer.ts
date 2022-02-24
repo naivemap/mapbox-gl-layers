@@ -20,10 +20,6 @@ class CoordinateSystem {
     })
   }
 
-  setMapOffset(mapOffset: number[]) {
-    this.mapOffset = mapOffset
-  }
-
   dataToPoint(data: [number, number]) {
     const px = this.map.project(data)
     const mapOffset = this.mapOffset
@@ -37,18 +33,22 @@ class CoordinateSystem {
     return [data.lng, data.lat]
   }
 
-  getViewRect() {
-    const canvas = this.map.getCanvas()
-    return new echarts.graphic.BoundingRect(0, 0, canvas.width, canvas.height)
-  }
+  // setMapOffset(mapOffset: number[]) {
+  //   this.mapOffset = mapOffset
+  // }
 
-  getRoamTransform() {
-    return echarts.matrix.create()
-  }
+  // getViewRect() {
+  //   const canvas = this.map.getCanvas()
+  //   return new echarts.graphic.BoundingRect(0, 0, canvas.width, canvas.height)
+  // }
 
-  getDimensionsInfo() {
-    return this.dimensions
-  }
+  // getRoamTransform() {
+  //   return echarts.matrix.create()
+  // }
+
+  // getDimensionsInfo() {
+  //   return this.dimensions
+  // }
 }
 
 export default class EchartsLayer {
@@ -125,9 +125,9 @@ export default class EchartsLayer {
     }
   }
 
-  _resetContainer() {
-    const canvas = this._map.getCanvas()
-    this._container.style.width = canvas.width + 'px'
-    this._container.style.height = canvas.height + 'px'
-  }
+  // private _resetContainer() {
+  //   const canvas = this._map.getCanvas()
+  //   this._container.style.width = canvas.width + 'px'
+  //   this._container.style.height = canvas.height + 'px'
+  // }
 }

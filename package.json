@@ -1,6 +1,6 @@
 {
-  "name": "mapbox-gl-echarts-layer",
-  "version": "0.1.0",
+  "name": "@naivemap/mapbox-gl-echarts-layer",
+  "version": "0.0.1-alpha",
   "description": "mapbox-gl-echarts-layer",
   "files": [
     "dist"
@@ -15,8 +15,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build"
   },
   "repository": "https://github.com/naivemap/mapbox-gl-echarts-layer",
   "keywords": [],
@@ -30,6 +29,7 @@
     "@types/node": "^17.0.15",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
+    "echarts": "^5.3.0",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
