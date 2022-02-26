@@ -5,6 +5,6 @@
     "strict": true,
     "moduleResolution": "node",
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "dist/mapbox-gl-echarts-layer.d.ts"],
   "exclude": []
 }
