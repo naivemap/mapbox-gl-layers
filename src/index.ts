@@ -1,5 +1,21 @@
 import * as echarts from 'echarts'
+import {
+  EffectScatterSeriesOption,
+  LegendComponentOption,
+  LinesSeriesOption,
+  ScatterSeriesOption,
+  TitleComponentOption,
+  TooltipComponentOption,
+} from 'echarts'
 
+export type ECOption = echarts.ComposeOption<
+  | TitleComponentOption
+  | TooltipComponentOption
+  | LegendComponentOption
+  | LinesSeriesOption
+  | ScatterSeriesOption
+  | EffectScatterSeriesOption
+>
 const COORDINATE_SYSTEM_NAME = 'mapboxgl-echarts'
 
 class CoordinateSystem {
@@ -50,23 +66,23 @@ class CoordinateSystem {
   // }
 }
 
-export default class EchartsLayer {
+export default class EchartsLayer implements mapboxgl.CustomLayerInterface {
   id: string
-  type: string
-  renderingMode: string
+  type: 'custom'
+  renderingMode: '2d'
   private _container!: HTMLDivElement
   private _map!: mapboxgl.Map
   private _ec: any
   private _coordSystemName: string
   private _registered = false
-  private _ecOptions: any
+  private _ecOption: ECOption
 
-  constructor(id: string, ecOptions: any) {
+  constructor(id: string, ecOption: ECOption) {
     this.id = id
     this.type = 'custom'
     this.renderingMode = '2d'
     this._coordSystemName = COORDINATE_SYSTEM_NAME
-    this._ecOptions = ecOptions
+    this._ecOption = ecOption
   }
 
   onAdd(map: mapboxgl.Map) {
@@ -79,7 +95,7 @@ export default class EchartsLayer {
     this._removeLayerContainer()
   }
 
-  setOption(option: any) {
+  setOption(option: ECOption) {
     if (this._ec) {
       this._ec.setOption(option)
     }
@@ -92,7 +108,7 @@ export default class EchartsLayer {
     if (!this._ec) {
       this._ec = echarts.init(this._container)
       this._prepareECharts()
-      this._ec.setOption(this._ecOptions)
+      this._ec.setOption(this._ecOption)
     } else {
       if (this._map.isMoving()) {
         this._ec.clear()
@@ -101,7 +117,7 @@ export default class EchartsLayer {
           width: this._map.getCanvas().width,
           height: this._map.getCanvas().height,
         })
-        this._ec.setOption(this._ecOptions)
+        this._ec.setOption(this._ecOption)
       }
     }
   }
@@ -112,7 +128,7 @@ export default class EchartsLayer {
       echarts.registerCoordinateSystem(this._coordSystemName, coordinateSystem as any)
       this._registered = true
     }
-    const series = this._ecOptions.series
+    const series = this._ecOption.series as any[]
     if (series) {
       for (let i = series.length - 1; i >= 0; i--) {
         // change coordinateSystem to mapboxgl-echarts

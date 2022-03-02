@@ -1,11 +1,12 @@
 {
   "name": "@naivemap/mapbox-gl-echarts-layer",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "mapbox-gl-echarts-layer",
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
-  "types": "./dist/mapbox-gl-echarts-layer.d.ts",
+  "types": "./types/index.d.ts",
   "main": "./dist/mapbox-gl-echarts-layer.umd.js",
   "module": "./dist/mapbox-gl-echarts-layer.es.js",
   "exports": {
