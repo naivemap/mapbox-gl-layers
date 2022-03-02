@@ -75,6 +75,7 @@ export default class EchartsLayer {
   }
 
   onRemove() {
+    this._ec.dispose()
     this._removeLayerContainer()
   }
 
@@ -84,8 +85,6 @@ export default class EchartsLayer {
     }
   }
 
-  // prerender() {}
-
   render() {
     if (!this._container) {
       this._createLayerContainer()
@@ -93,9 +92,17 @@ export default class EchartsLayer {
     if (!this._ec) {
       this._ec = echarts.init(this._container)
       this._prepareECharts()
-      this._ec.setOption(this._ecOptions, false)
+      this._ec.setOption(this._ecOptions)
     } else {
-      this._ec.resize()
+      if (this._map.isMoving()) {
+        this._ec.clear()
+      } else {
+        this._ec.resize({
+          width: this._map.getCanvas().width,
+          height: this._map.getCanvas().height,
+        })
+        this._ec.setOption(this._ecOptions)
+      }
     }
   }
 
