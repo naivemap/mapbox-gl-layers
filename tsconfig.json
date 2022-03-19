@@ -3,8 +3,6 @@
     "module": "esnext",
     "outDir": "./dist",
     "strict": true,
-    "declaration": true,
-    "declarationDir": "./types",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
   },

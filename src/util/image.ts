@@ -1,5 +1,5 @@
 /**
- * loadImage
+ * load image
  * @param src
  * @returns
  */
