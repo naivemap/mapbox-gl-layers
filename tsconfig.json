@@ -3,8 +3,11 @@
     "module": "esnext",
     "outDir": "./dist",
     "strict": true,
+    "declaration": true,
+    "declarationDir": "./types",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
   },
-  "include": ["src/**/*.ts", "dist/mapbox-gl-echarts-layer.d.ts"],
+  "include": ["src/**/*.ts", "types/*.d.ts"],
   "exclude": []
 }
