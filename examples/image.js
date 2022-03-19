@@ -1,4 +1,4 @@
-import { ImageLayer } from '../src/index'
+import { ImageLayer } from '../dist/mapbox-gl-ex-layers.es'
 import proj4 from 'proj4'
 
 mapboxgl.accessToken =
@@ -48,12 +48,4 @@ map.on('load', () => {
   })
 
   map.addLayer(layer, 'aeroway-line')
-
-  setTimeout(() => {
-    map.removeLayer('layer-id')
-  }, 2000);
-
-  setTimeout(() => {
-    map.addLayer(layer, 'aeroway-line')
-  }, 3000);
 })
