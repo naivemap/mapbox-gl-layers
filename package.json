@@ -1,6 +1,6 @@
 {
   "name": "@naivemap/mapbox-gl-ex-layers",
-  "version": "0.1.0-beta.1",
+  "version": "0.2.0-beta.2",
   "description": "mapbox-gl-ex-layers",
   "files": [
     "dist",

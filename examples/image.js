@@ -24,18 +24,19 @@ map.on('load', () => {
     '+towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 ' +
     '+units=m +no_defs'
   )
-  // const layer = new ImageLayer('layer-id', {
-  //   url: '/2000px-British_National_Grid.svg.png',
-  //   projection: 'EPSG:27700',
-  //   coordinates: [
-  //     [0, 1300000], // top-left
-  //     [700000, 1300000], // top-right
-  //     [700000, 0], // bottom-right
-  //     [0, 0], // bottom-left
-  //   ]
-  // })
 
-  const layer = new ImageLayer('layer-id', {
+  const layer27700 = new ImageLayer('layer-27700', {
+    url: '/2000px-British_National_Grid.svg.png',
+    projection: 'EPSG:27700',
+    coordinates: [
+      [0, 1300000], // top-left
+      [700000, 1300000], // top-right
+      [700000, 0], // bottom-right
+      [0, 0], // bottom-left
+    ]
+  })
+
+  const layer4326 = new ImageLayer('layer-4326', {
     url: '/4326.png',
     projection: 'EPSG:4326',
     // resampling: 'nearest',
@@ -47,5 +48,6 @@ map.on('load', () => {
     ]
   })
 
-  map.addLayer(layer, 'aeroway-line')
+  map.addLayer(layer4326, 'aeroway-line')
+  // map.addLayer(layer27700, 'aeroway-line')
 })
