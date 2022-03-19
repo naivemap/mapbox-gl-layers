@@ -1,18 +1,18 @@
 {
-  "name": "@naivemap/mapbox-gl-echarts-layer",
-  "version": "0.1.4",
-  "description": "mapbox-gl-echarts-layer",
+  "name": "@naivemap/mapbox-gl-ex-layers",
+  "version": "0.1.0-beta.1",
+  "description": "mapbox-gl-ex-layers",
   "files": [
     "dist",
     "types"
   ],
   "types": "./types/index.d.ts",
-  "main": "./dist/mapbox-gl-echarts-layer.umd.js",
-  "module": "./dist/mapbox-gl-echarts-layer.es.js",
+  "main": "./dist/mapbox-gl-ex-layers.umd.js",
+  "module": "./dist/mapbox-gl-ex-layers.es.js",
   "exports": {
     ".": {
-      "import": "./dist/mapbox-gl-echarts-layer.es.js",
-      "require": "./dist/mapbox-gl-echarts-layer.umd.js"
+      "import": "./dist/mapbox-gl-ex-layers.es.js",
+      "require": "./dist/mapbox-gl-ex-layers.umd.js"
     }
   },
   "scripts": {
@@ -21,25 +21,31 @@
     "prettier": "prettier --write .",
     "build": "vite build"
   },
-  "repository": "https://github.com/naivemap/mapbox-gl-echarts-layer",
+  "repository": "https://github.com/naivemap/mapbox-gl-ex-layers",
   "keywords": [
     "mapbox-gl",
+    "reprojection image",
     "echarts"
   ],
   "license": "MIT",
   "peerDependencies": {
-    "echarts": "^5.3.0"
+    "arrugator": "^1.0.1",
+    "echarts": "^5.3.0",
+    "proj4": "^2.8.0"
   },
   "devDependencies": {
     "@types/mapbox-gl": "^2.6.1",
     "@types/node": "^17.0.15",
+    "@types/proj4": "^2.5.2",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
+    "arrugator": "^1.0.1",
     "echarts": "^5.3.0",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.5.1",
+    "proj4": "^2.8.0",
     "typescript": "^4.5.5",
     "vite": "^2.7.13"
   }

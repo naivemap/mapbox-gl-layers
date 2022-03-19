@@ -4,7 +4,8 @@
     "outDir": "./dist",
     "strict": true,
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*.ts", "dist/mapbox-gl-echarts-layer.d.ts"],
+  "include": ["src/**/*.ts", "types/*.d.ts"],
   "exclude": []
 }
