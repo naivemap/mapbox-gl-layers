@@ -1,18 +1,18 @@
 {
-  "name": "@naivemap/mapbox-gl-ex-layers",
-  "version": "0.2.1-beta1",
-  "description": "mapbox-gl-ex-layers",
+  "name": "@naivemap/mapbox-gl-layers",
+  "version": "0.2.1",
+  "description": "mapbox-gl-layers",
   "files": [
     "dist",
     "types"
   ],
   "types": "./types/index.d.ts",
-  "main": "./dist/mapbox-gl-ex-layers.umd.js",
-  "module": "./dist/mapbox-gl-ex-layers.es.js",
+  "module": "./dist/mapbox-gl-layers.es.js",
+  "main": "./dist/mapbox-gl-layers.umd.js",
   "exports": {
     ".": {
-      "import": "./dist/mapbox-gl-ex-layers.es.js",
-      "require": "./dist/mapbox-gl-ex-layers.umd.js"
+      "import": "./dist/mapbox-gl-layers.es.js",
+      "require": "./dist/mapbox-gl-layers.umd.js"
     }
   },
   "scripts": {
@@ -21,7 +21,7 @@
     "prettier": "prettier --write .",
     "build": "vite build"
   },
-  "repository": "https://github.com/naivemap/mapbox-gl-ex-layers",
+  "repository": "https://github.com/naivemap/mapbox-gl-layers",
   "keywords": [
     "mapbox-gl",
     "reprojection image",
@@ -29,7 +29,6 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "arrugator": "^1.0.1",
     "echarts": "^5.3.0",
     "proj4": "^2.8.0"
   },

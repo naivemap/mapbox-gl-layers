@@ -1,2 +1,4 @@
-export { default as EChartsLayer } from './EChartsLayer'
-export { default as ImageLayer } from './ImageLayer'
+import ImageLayer from './ImageLayer'
+import EChartsLayer from './EChartsLayer'
+
+export { ImageLayer, EChartsLayer }

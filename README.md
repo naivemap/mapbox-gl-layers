@@ -20,8 +20,10 @@ map.addLayer(layer)
 
 ## ImageLayer
 
+[图片](https://huanglii.github.io/mapbox-gl-js-cookbook/example/data-image-4326.html)
+
 ```bash
-npm i @naivemap/mapbox-gl-layers arrugator proj4
+npm i @naivemap/mapbox-gl-layers proj4
 ```
 
 ```js
