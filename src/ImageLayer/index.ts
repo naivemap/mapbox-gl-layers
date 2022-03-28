@@ -34,6 +34,8 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   }
   private _program: WebGLProgram | null
   private _texture: WebGLTexture | null
+  private _positionBuffer: WebGLBuffer | null
+  private _uvBuffer: WebGLBuffer | null
   private _verticesIndexBuffer: WebGLBuffer | null
 
   constructor(id: string, option: ImageOption) {
@@ -54,6 +56,8 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
 
     this._program = null
     this._texture = null
+    this._positionBuffer = null
+    this._uvBuffer = null
     this._verticesIndexBuffer = null
   }
 
@@ -100,23 +104,17 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
     this._program = createProgram(gl, vertexSource, fragmentSource)
 
     if (this._program) {
-      const positionBuffer = gl.createBuffer()
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+      this._positionBuffer = gl.createBuffer()
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer)
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.pos), gl.STATIC_DRAW)
       const a_pos = gl.getAttribLocation(this._program, 'a_pos')
-      if (a_pos < 0) {
-        console.log('Failed to get the storage location of a_pos')
-      }
       gl.vertexAttribPointer(a_pos, 2, gl.FLOAT, false, 0, 0)
       gl.enableVertexAttribArray(a_pos)
 
-      const uvBuffer = gl.createBuffer()
-      gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer)
+      this._uvBuffer = gl.createBuffer()
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._uvBuffer)
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.uv), gl.STATIC_DRAW)
       const a_uv = gl.getAttribLocation(this._program, 'a_uv')
-      if (a_uv < 0) {
-        console.log('Failed to get the storage location of a_uv')
-      }
       gl.vertexAttribPointer(a_uv, 2, gl.FLOAT, false, 0, 0)
       gl.enableVertexAttribArray(a_uv)
 
@@ -135,19 +133,28 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   render(gl: WebGLRenderingContext, matrix: number[]): void {
     if (this._loaded && this._program) {
       gl.useProgram(this._program)
+
+      // matrix
       gl.uniformMatrix4fv(gl.getUniformLocation(this._program, 'u_matrix'), false, matrix)
-      // 开启 10 号纹理单元，尽量避免冲突 bug
-      gl.activeTexture(gl.TEXTURE10)
-      // 绑定纹理对象
-      gl.bindTexture(gl.TEXTURE_2D, this._texture)
-      // 将 10 号纹理传递给着色器
-      gl.uniform1i(gl.getUniformLocation(this._program, 'u_sampler'), 10)
-      /**
-       * 不 bindBuffer 会报错误：GL_INVALID_OPERATION: Insufficient buffer size.
-       * https://www.tutorialguruji.com/javascript/gl_invalid_operation-insufficient-buffer-size-after-variable-number-of-render-calls/
-       */
+      // pos
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer)
+      gl.vertexAttribPointer(gl.getAttribLocation(this._program, 'a_pos'), 2, gl.FLOAT, false, 0, 0)
+      // uv
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._uvBuffer)
+      gl.vertexAttribPointer(gl.getAttribLocation(this._program, 'a_uv'), 2, gl.FLOAT, false, 0, 0)
+
+      // index
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._verticesIndexBuffer)
+
+      // texture
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, this._texture)
+      gl.uniform1i(gl.getUniformLocation(this._program, 'u_sampler'), 0)
+
       gl.drawElements(gl.TRIANGLES, this._arrugado.trigs.length, gl.UNSIGNED_SHORT, 0)
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, null)
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
     }
   }
 

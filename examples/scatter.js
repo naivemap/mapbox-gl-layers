@@ -1,4 +1,7 @@
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { EChartsLayer } from '../dist/mapbox-gl-ex-layers.es'
+
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaHVhbmdsaWkiLCJhIjoiY2wwM2E4a2drMDVrZjNrcGRucHIxOHo0cyJ9.0ecG5KGQE6R-SmhxvLvhHg'
 const map = new mapboxgl.Map({

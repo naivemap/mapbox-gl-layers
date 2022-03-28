@@ -66,7 +66,7 @@ class CoordinateSystem {
   // }
 }
 
-export default class EchartsLayer implements mapboxgl.CustomLayerInterface {
+export default class EChartsLayer implements mapboxgl.CustomLayerInterface {
   id: string
   type: 'custom'
   renderingMode?: '2d' | '3d' | undefined
