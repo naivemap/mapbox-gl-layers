@@ -15,12 +15,6 @@
       "require": "./dist/mapbox-gl-layers.umd.js"
     }
   },
-  "scripts": {
-    "dev": "vite",
-    "lint": "eslint src --fix --ext .ts,.tsx,.vue,.js,.jsx",
-    "prettier": "prettier --write .",
-    "build": "vite build"
-  },
   "repository": "https://github.com/naivemap/mapbox-gl-layers",
   "keywords": [
     "mapbox-gl",
@@ -28,21 +22,51 @@
     "echarts"
   ],
   "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "eslint:comment": "使用 ESLint 检查并自动修复 src 目录下所有扩展名为 .js 和 .vue 的文件",
+    "eslint": "eslint --ext .js,.ts --ignore-path .gitignore --fix src",
+    "prettier:comment": "自动格式化当前目录下的所有文件",
+    "prettier": "prettier .  --write",
+    "commit:comment": "引导设置规范化的提交信息",
+    "commit": "git-cz",
+    "prepare": "husky install"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "npm run eslint",
+      "npm run prettier"
+    ]
+  },
   "peerDependencies": {
     "echarts": "^5.3.0",
     "proj4": "^2.8.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
     "@types/mapbox-gl": "^2.6.1",
     "@types/node": "^17.0.15",
     "@types/proj4": "^2.5.2",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "arrugator": "^1.0.1",
+    "commitizen": "^4.2.4",
+    "commitlint-config-cz": "^0.13.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "cz-customizable": "^6.3.0",
     "echarts": "^5.3.0",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.7",
     "mapbox-gl": "^2.7.1",
     "prettier": "^2.5.1",
     "proj4": "^2.8.0",
