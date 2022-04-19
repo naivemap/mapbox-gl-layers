@@ -10,7 +10,7 @@ npm i @naivemap/mapbox-gl-layers
 
 ## Usage in your application
 
-See [Documention](./doc/index.md) for complete reference.
+See [API Reference](./doc/index.md) for complete reference.
 
 ### EChartsLayer
 
