@@ -5,27 +5,29 @@
 <b>Signature:</b>
 
 ```typescript
-export default class ImageLayer implements mapboxgl.CustomLayerInterface 
+export default class ImageLayer implements mapboxgl.CustomLayerInterface
 ```
+
 <b>Implements:</b> mapboxgl.CustomLayerInterface
 
 ## Constructors
 
-|  Constructor | Description |
-|  --- | --- |
-|  (constructor)(`id`: `string`, `option`: `ImageOption`) | Constructs a new instance of the <code>ImageLayer</code> class |
+| Constructor | Description |
+| --- | --- |
+| (constructor)(`id`: `string`, `option`: `ImageOption`) | Constructs a new instance of the <code>ImageLayer</code> class |
 
 ### Parameters
+
 **id** `(string)` The ID of the layer.
 
 **option** `(ImageOption)` The option of the image.
 
-|  Name | Description |
-|  --- | --- |
-|  **option.url** <br />`(string)` | URL that points to an image.  |
-|  **option.projection** <br />`(string)` | Projection with EPSG code that points to the image.  |
-|  **option.resampling** <br />(Optional `enum`. One of `"linear"`, `"nearest"`. Defaults to `"linear"`) | The resampling/interpolation method to use for overscaling, also known as texture magnification filter. ref: [raster-resampling](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-raster-raster-resampling)  |
-|  **option.coordinates** <br />`(Array<Array<number>>)` | Corners of image specified in longitude, latitude pairs: top left, top right, bottom right, bottom left. ref: [coordinates](https://docs.mapbox.com/mapbox-gl-js/style-spec/sources/#image-coordinates)  |
+| Name | Description |
+| --- | --- |
+| **option.url** <br />`(string)` | URL that points to an image. |
+| **option.projection** <br />`(string)` | Projection with EPSG code that points to the image. |
+| **option.resampling** <br />(Optional `enum`. One of `"linear"`, `"nearest"`. Defaults to `"linear"`) | The resampling/interpolation method to use for overscaling, also known as texture magnification filter. ref: [raster-resampling](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-raster-raster-resampling) |
+| **option.coordinates** <br />`(Array<Array<number>>)` | Corners of image specified in longitude, latitude pairs: top left, top right, bottom right, bottom left. ref: [coordinates](https://docs.mapbox.com/mapbox-gl-js/style-spec/sources/#image-coordinates) |
 
 ```ts
 export type ImageOption = {
@@ -38,9 +40,9 @@ export type ImageOption = {
 
 ### Methods
 
-|  Method | Description |
-|  --- | --- |
-|  **update** `(url: string)` | Update the image URL. |
+| Method                     | Description           |
+| -------------------------- | --------------------- |
+| **update** `(url: string)` | Update the image URL. |
 
 ## Example
 
