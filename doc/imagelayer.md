@@ -36,6 +36,12 @@ export type ImageOption = {
 }
 ```
 
+### Methods
+
+|  Method | Description |
+|  --- | --- |
+|  **update** `(url: string)` | Update the image URL. |
+
 ## Example
 
 ```ts

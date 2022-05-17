@@ -287,6 +287,8 @@ class ImageLayer {
       uv: arrugado.uv.flat(),
       trigs: arrugado.trigs.flat()
     };
+    this._map = null;
+    this._gl = null;
     this._program = null;
     this._texture = null;
     this._positionBuffer = null;
@@ -294,18 +296,9 @@ class ImageLayer {
     this._verticesIndexBuffer = null;
   }
   onAdd(map, gl) {
-    loadImage(this._option.url).then((img) => {
-      this._loaded = true;
-      this._texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, this._texture);
-      const textureFilter = this._option.resampling === "nearest" ? gl.NEAREST : gl.LINEAR;
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureFilter);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, textureFilter);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      map.triggerRepaint();
-    });
+    this._map = map;
+    this._gl = gl;
+    this._loadImage(map, gl);
     const vertexSource = `
       uniform mat4 u_matrix;
       attribute vec2 a_pos;
@@ -366,6 +359,13 @@ class ImageLayer {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
   }
+  update(url) {
+    this._loaded = false;
+    this._option.url = url;
+    if (this._gl && this._map) {
+      this._loadImage(this._map, this._gl);
+    }
+  }
   _initArrugator(fromProj, coordinates) {
     const origin = [-20037508342789244e-9, 20037508342789244e-9];
     const verts = [coordinates[0], coordinates[3], coordinates[1], coordinates[2]];
@@ -389,6 +389,20 @@ class ImageLayer {
     ]);
     arrugator.lowerEpsilon(epsilon);
     return arrugator.output();
+  }
+  _loadImage(map, gl) {
+    loadImage(this._option.url).then((img) => {
+      this._loaded = true;
+      this._texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this._texture);
+      const textureFilter = this._option.resampling === "nearest" ? gl.NEAREST : gl.LINEAR;
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureFilter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, textureFilter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      map.triggerRepaint();
+    });
   }
 }
 const COORDINATE_SYSTEM_NAME = "mapboxgl-echarts";

@@ -32,6 +32,8 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
     uv: number[]
     trigs: number[]
   }
+  private _map: mapboxgl.Map | null
+  private _gl: WebGLRenderingContext | null
   private _program: WebGLProgram | null
   private _texture: WebGLTexture | null
   private _positionBuffer: WebGLBuffer | null
@@ -54,6 +56,8 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
       trigs: arrugado.trigs.flat(), // 三角形索引
     }
 
+    this._map = null
+    this._gl = null
     this._program = null
     this._texture = null
     this._positionBuffer = null
@@ -62,23 +66,9 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   }
 
   onAdd(map: mapboxgl.Map, gl: WebGLRenderingContext) {
-    loadImage(this._option.url).then((img) => {
-      this._loaded = true
-
-      // 创建纹理
-      this._texture = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D, this._texture)
-
-      const textureFilter = this._option.resampling === 'nearest' ? gl.NEAREST : gl.LINEAR
-
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureFilter)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, textureFilter)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
-
-      map.triggerRepaint()
-    })
+    this._map = map
+    this._gl = gl
+    this._loadImage(map, gl)
 
     const vertexSource = `
       uniform mat4 u_matrix;
@@ -158,6 +148,15 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
     }
   }
 
+  update(url: string) {
+    this._loaded = false
+    this._option.url = url
+
+    if (this._gl && this._map) {
+      this._loadImage(this._map, this._gl)
+    }
+  }
+
   private _initArrugator(fromProj: string, coordinates: Coordinates): Arrugado {
     // 墨卡托投影的左上角坐标，对应 mapbox 左上角起始坐标 [0,0]
     const origin = [-20037508.342789244, 20037508.342789244]
@@ -190,5 +189,25 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
     arrugator.lowerEpsilon(epsilon)
 
     return arrugator.output()
+  }
+
+  private _loadImage(map: mapboxgl.Map, gl: WebGLRenderingContext) {
+    loadImage(this._option.url).then((img) => {
+      this._loaded = true
+
+      // 创建纹理
+      this._texture = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D, this._texture)
+
+      const textureFilter = this._option.resampling === 'nearest' ? gl.NEAREST : gl.LINEAR
+
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureFilter)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, textureFilter)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+
+      map.triggerRepaint()
+    })
   }
 }

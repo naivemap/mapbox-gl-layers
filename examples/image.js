@@ -39,7 +39,7 @@ map.on('load', () => {
   })
 
   const layer4326 = new ImageLayer('layer-4326', {
-    url: '/4326.png',
+    url: '/4326-red.png',
     projection: 'EPSG:4326',
     // resampling: 'nearest',
     coordinates: [
@@ -52,4 +52,8 @@ map.on('load', () => {
 
   map.addLayer(layer27700, 'aeroway-line')
   map.addLayer(layer4326, 'aeroway-line')
+
+  setTimeout(() => {
+    layer4326.update('/4326-green.png')
+  }, 3000)
 })
