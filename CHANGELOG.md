@@ -2,22 +2,22 @@
 
 ### ✨ Features
 
-- `ImageLayer` 增加 `update(url: string)` 方法，允许用户更新图片
+- `ImageLayer` adds `update(url: string)` method to allow user update the image URL.
 
 ## 0.2.1
 
 ### 🐞 Bug fixes
 
-- 修复 添加多个 `ImageLayer` 时，图片在同一位置
+- Fix the images locate at the same coordinate when adding more than one `ImageLayer`.
 
 ## 0.2.0
 
 ### ✨ Features
 
-- 新增 `ImageLayer`
+- Add `ImageLayer`
 
 ## 0.1.0
 
 ### ✨ Features
 
-- 新增 `EChartsLayer`
+- Add `EChartsLayer`
