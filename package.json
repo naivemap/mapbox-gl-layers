@@ -15,6 +15,7 @@
       "require": "./dist/mapbox-gl-layers.umd.js"
     }
   },
+  "sideEffects": false,
   "repository": "https://github.com/naivemap/mapbox-gl-layers",
   "keywords": [
     "mapbox-gl",
