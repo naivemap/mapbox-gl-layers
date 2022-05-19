@@ -4,7 +4,8 @@ export declare type ImageOption = {
   url: string
   projection: string
   coordinates: Coordinates
-  resampling: 'linear' | 'nearest'
+  resampling?: 'linear' | 'nearest'
+  crossOrigin?: string
 }
 export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   id: string
@@ -20,5 +21,6 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   onAdd(map: mapboxgl.Map, gl: WebGLRenderingContext): void
   onRemove(map: mapboxgl.Map, gl: WebGLRenderingContext): void
   render(gl: WebGLRenderingContext, matrix: number[]): void
+  update(url: string): void
   private _initArrugator
 }

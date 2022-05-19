@@ -18,7 +18,8 @@ export type ImageOption = {
   url: string
   projection: string
   coordinates: Coordinates
-  resampling: 'linear' | 'nearest'
+  resampling?: 'linear' | 'nearest'
+  crossOrigin?: string
 }
 
 export default class ImageLayer implements mapboxgl.CustomLayerInterface {
@@ -192,7 +193,7 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   }
 
   private _loadImage(map: mapboxgl.Map, gl: WebGLRenderingContext) {
-    loadImage(this._option.url).then((img) => {
+    loadImage(this._option.url, this._option.crossOrigin).then((img) => {
       this._loaded = true
 
       // 创建纹理

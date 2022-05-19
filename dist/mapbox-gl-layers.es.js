@@ -220,9 +220,10 @@ class Arrugator {
     this._segment(v3, v2, t2);
   }
 }
-function loadImage(src) {
+function loadImage(src, crossOrigin) {
   return new Promise((res, rej) => {
     const img = new Image();
+    img.crossOrigin = crossOrigin != null ? crossOrigin : "";
     img.src = src;
     img.onload = function() {
       res(img);
@@ -391,7 +392,7 @@ class ImageLayer {
     return arrugator.output();
   }
   _loadImage(map, gl) {
-    loadImage(this._option.url).then((img) => {
+    loadImage(this._option.url, this._option.crossOrigin).then((img) => {
       this._loaded = true;
       this._texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, this._texture);

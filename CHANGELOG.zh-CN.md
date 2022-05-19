@@ -1,3 +1,13 @@
+## 0.3.1
+
+### ✨ Features
+
+- `ImageLayer` 新增 `crossOrigin` 选项
+
+### 🐞 Bug fixes
+
+- 修复 `ImageLayer` 的 `ImageOption` 错误
+
 ## 0.3.0
 
 ### ✨ Features

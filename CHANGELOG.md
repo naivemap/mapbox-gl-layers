@@ -1,3 +1,13 @@
+## 0.3.1
+
+### ✨ Features
+
+- Add `crossOrigin` option to `ImageLayer` for the image.
+
+### 🐞 Bug fixes
+
+- Fix `ImageOption`'s type of the `ImageLayer` is incorrect.
+
 ## 0.3.0
 
 ### ✨ Features
