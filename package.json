@@ -32,7 +32,8 @@
     "prettier": "prettier .  --write",
     "commit:comment": "引导设置规范化的提交信息",
     "commit": "git-cz",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublishOnly": "npm run build"
   },
   "config": {
     "commitizen": {

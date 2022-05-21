@@ -28,7 +28,7 @@ map.on('load', () => {
   )
 
   const layer27700 = new ImageLayer('layer-27700', {
-    url: '/2000px-British_National_Grid.svg.png',
+    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/British_National_Grid.svg/2000px-British_National_Grid.svg.png',
     projection: 'EPSG:27700',
     coordinates: [
       [0, 1300000], // top-left
@@ -39,7 +39,7 @@ map.on('load', () => {
   })
 
   const layer4326 = new ImageLayer('layer-4326', {
-    url: '/4326-red.png',
+    url: 'https://www.naivemap.com/mapbox-gl-js-cookbook/assets/images/4326.png',
     projection: 'EPSG:4326',
     // resampling: 'nearest',
     coordinates: [
@@ -52,8 +52,4 @@ map.on('load', () => {
 
   map.addLayer(layer27700, 'aeroway-line')
   map.addLayer(layer4326, 'aeroway-line')
-
-  setTimeout(() => {
-    layer4326.update('/4326-green.png')
-  }, 3000)
 })
