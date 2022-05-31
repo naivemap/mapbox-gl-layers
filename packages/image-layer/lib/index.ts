@@ -1,8 +1,9 @@
+// @ts-ignore
 import Arrugator from 'arrugator'
 import proj4 from 'proj4'
 
-import { loadImage } from '../util/image'
-import { createProgram } from '../util/webgl'
+import { loadImage } from './utils/image'
+import { createProgram } from './utils/webgl'
 
 // top left, top right, bottom right, bottom left.
 type Coordinates = [[number, number], [number, number], [number, number], [number, number]]
