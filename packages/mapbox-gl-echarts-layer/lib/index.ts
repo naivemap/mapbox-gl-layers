@@ -1,5 +1,7 @@
-import * as echarts from 'echarts'
 import {
+  init,
+  registerCoordinateSystem,
+  ComposeOption,
   EffectScatterSeriesOption,
   LegendComponentOption,
   LinesSeriesOption,
@@ -8,7 +10,7 @@ import {
   TooltipComponentOption,
 } from 'echarts'
 
-export type ECOption = echarts.ComposeOption<
+export type ECOption = ComposeOption<
   | TitleComponentOption
   | TooltipComponentOption
   | LegendComponentOption
@@ -104,7 +106,7 @@ export default class EChartsLayer implements mapboxgl.CustomLayerInterface {
       this._createLayerContainer()
     }
     if (!this._ec) {
-      this._ec = echarts.init(this._container)
+      this._ec = init(this._container)
       this._prepareECharts()
       this._ec.setOption(this._ecOption)
     } else {
@@ -123,7 +125,7 @@ export default class EChartsLayer implements mapboxgl.CustomLayerInterface {
   private _prepareECharts() {
     if (!this._registered) {
       const coordinateSystem = new CoordinateSystem(this._map)
-      echarts.registerCoordinateSystem(this._coordSystemName, coordinateSystem as any)
+      registerCoordinateSystem(this._coordSystemName, coordinateSystem as any)
       this._registered = true
     }
     const series = this._ecOption.series as any[]

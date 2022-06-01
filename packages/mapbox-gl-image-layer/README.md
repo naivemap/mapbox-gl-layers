@@ -1,6 +1,8 @@
-[Home](./index.md) &gt; [ImageLayer](./imagelayer.md)
-
 ## ImageLayer class
+
+```bash
+npm i @naivemap/mapbox-gl-image-layer proj4
+```
 
 <b>Signature:</b>
 

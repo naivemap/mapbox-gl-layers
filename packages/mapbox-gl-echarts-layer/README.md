@@ -1,6 +1,8 @@
-[Home](./index.md) &gt; [EChartsLayer](./echartslayer.md)
-
 ## EChartsLayer class
+
+```bash
+npm i @naivemap/mapbox-gl-echarts-layer echarts
+```
 
 <b>Signature:</b>
 
