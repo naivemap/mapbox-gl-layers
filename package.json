@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@naivemap/mapbox-gl-layers",
-  "description": "mapbox-gl-layers",
+  "description": "Some implementations of mapbox's custom layer API",
   "repository": "https://github.com/naivemap/mapbox-gl-layers",
   "workspaces": [
     "packages/*"
