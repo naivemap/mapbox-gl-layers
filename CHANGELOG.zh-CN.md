@@ -1,3 +1,9 @@
+## 0.3.2
+
+### ⚠️ Breaking changes
+
+- 拆分为 [@naivemap/mapbox-gl-echarts-layer](https://www.npmjs.com/package/@naivemap/mapbox-gl-echarts-layer) 和 [@naivemap/mapbox-gl-image-layer](https://www.npmjs.com/package/@naivemap/mapbox-gl-image-layer)，分别发布
+
 ## 0.3.1
 
 ### ✨ Features

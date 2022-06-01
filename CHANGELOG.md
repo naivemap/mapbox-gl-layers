@@ -1,3 +1,9 @@
+## 0.3.2
+
+### ⚠️ Breaking changes
+
+- The package is split into [@naivemap/mapbox-gl-echarts-layer](https://www.npmjs.com/package/@naivemap/mapbox-gl-echarts-layer) and [@naivemap/mapbox-gl-image-layer](https://www.npmjs.com/package/@naivemap/mapbox-gl-image-layer).
+
 ## 0.3.1
 
 ### ✨ Features

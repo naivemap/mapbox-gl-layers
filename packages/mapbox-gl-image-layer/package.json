@@ -1,6 +1,6 @@
 {
   "name": "@naivemap/mapbox-gl-image-layer",
-  "version": "0.3.2-beta.2",
+  "version": "0.3.2",
   "description": "Load a static image of any projection via Arrugator and Proj4js.",
   "author": "huanglii <li.huangli@qq.com>",
   "homepage": "https://github.com/naivemap/mapbox-gl-layers#readme",

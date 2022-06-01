@@ -1,6 +1,6 @@
 {
   "name": "@naivemap/mapbox-gl-echarts-layer",
-  "version": "0.3.2-beta.2",
+  "version": "0.3.2",
   "description": "Integrate the Lines graph and Scatter (bubble) chart of Apache ECharts.",
   "author": "huanglii <li.huangli@qq.com>",
   "homepage": "https://github.com/naivemap/mapbox-gl-layers#readme",
