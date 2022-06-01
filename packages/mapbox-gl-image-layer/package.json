@@ -21,12 +21,9 @@
   ],
   "keywords": [
     "mapbox-gl",
-    "reprojection image",
+    "reprojection",
     "proj4"
   ],
-  "publishConfig": {
-    "registry": "http://localhost:4873/"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/naivemap/mapbox-gl-layers.git"
