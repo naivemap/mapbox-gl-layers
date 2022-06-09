@@ -43,9 +43,18 @@ export type ImageOption = {
 
 ### Methods
 
-| Method                     | Description           |
-| -------------------------- | --------------------- |
-| **update** `(url: string)` | Update the image URL. |
+#### updateImage
+
+Updates the image URL and, optionally, the projection, the coordinates and the resampling.
+
+```ts
+updateImage(option: {
+  url: string
+  projection?: string
+  coordinates?: Coordinates
+  resampling?: 'linear' | 'nearest'
+}): this
+```
 
 ## Example
 

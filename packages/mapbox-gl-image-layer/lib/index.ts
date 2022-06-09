@@ -1,19 +1,7 @@
-// @ts-ignore
-import Arrugator from 'arrugator'
-import proj4 from 'proj4'
-
 import { loadImage } from './utils/image'
 import { createProgram } from './utils/webgl'
-
-// top left, top right, bottom right, bottom left.
-type Coordinates = [[number, number], [number, number], [number, number], [number, number]]
-
-type Arrugado = {
-  unprojected: [number, number][]
-  projected: [number, number][]
-  uv: [number, number][]
-  trigs: [number, number][]
-}
+import { initArrugator } from './utils/arrugator'
+import type { ArrugadoFlat, Coordinates } from './utils/arrugator'
 
 export type ImageOption = {
   url: string
@@ -29,11 +17,7 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   renderingMode?: '2d' | '3d' | undefined
   private _option: ImageOption
   private _loaded: boolean
-  private _arrugado: {
-    pos: number[]
-    uv: number[]
-    trigs: number[]
-  }
+  private _arrugado: ArrugadoFlat
   private _map: mapboxgl.Map | null
   private _gl: WebGLRenderingContext | null
   private _program: WebGLProgram | null
@@ -51,12 +35,7 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
 
     // 初始化 Arrugator
     const { projection, coordinates } = option
-    const arrugado = this._initArrugator(projection, coordinates)
-    this._arrugado = {
-      pos: arrugado.projected.flat(), // mapbox 墨卡托坐标
-      uv: arrugado.uv.flat(), // uv 纹理
-      trigs: arrugado.trigs.flat(), // 三角形索引
-    }
+    this._arrugado = initArrugator(projection, coordinates)
 
     this._map = null
     this._gl = null
@@ -97,22 +76,24 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
 
     if (this._program) {
       this._positionBuffer = gl.createBuffer()
-      gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer)
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.pos), gl.STATIC_DRAW)
+      // gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer)
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.pos), gl.STATIC_DRAW)
       const a_pos = gl.getAttribLocation(this._program, 'a_pos')
       gl.vertexAttribPointer(a_pos, 2, gl.FLOAT, false, 0, 0)
       gl.enableVertexAttribArray(a_pos)
 
       this._uvBuffer = gl.createBuffer()
-      gl.bindBuffer(gl.ARRAY_BUFFER, this._uvBuffer)
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.uv), gl.STATIC_DRAW)
+      // gl.bindBuffer(gl.ARRAY_BUFFER, this._uvBuffer)
+      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._arrugado.uv), gl.STATIC_DRAW)
       const a_uv = gl.getAttribLocation(this._program, 'a_uv')
       gl.vertexAttribPointer(a_uv, 2, gl.FLOAT, false, 0, 0)
       gl.enableVertexAttribArray(a_uv)
 
       this._verticesIndexBuffer = gl.createBuffer()
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._verticesIndexBuffer)
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._arrugado.trigs), gl.STATIC_DRAW)
+      // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._verticesIndexBuffer)
+      // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._arrugado.trigs), gl.STATIC_DRAW)
+
+      this._bindData(gl, this._arrugado)
     }
   }
 
@@ -150,47 +131,50 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
     }
   }
 
-  update(url: string) {
+  /**
+   * Updates the image URL and, optionally, the projection, the coordinates and the resampling.
+   * @param {Object} option Options object.
+   * @param {string} [option.url] Required image URL.
+   * @param {string} [option.projection] Projection with EPSG code that points to the image..
+   * @param {Array<Array<number>>} [option.coordinates] Four geographical coordinates,
+   * @param {string} [option.resampling] The resampling/interpolation method to use for overscaling.
+   */
+  updateImage(option: {
+    url: string
+    projection?: string
+    coordinates?: Coordinates
+    resampling?: 'linear' | 'nearest'
+  }) {
     this._loaded = false
-    this._option.url = url
+    this._option.url = option.url
 
     if (this._gl && this._map) {
+      if (option.projection || option.coordinates) {
+        this._option.projection = option.projection ?? this._option.projection
+        this._option.coordinates = option.coordinates ?? this._option.coordinates
+
+        // reinit arrugator
+        this._arrugado = initArrugator(this._option.projection, this._option.coordinates)
+        this._bindData(this._gl, this._arrugado)
+      }
+
+      this._option.resampling = option.resampling ?? this._option.resampling
+      // reload image
       this._loadImage(this._map, this._gl)
     }
+
+    return this
   }
 
-  private _initArrugator(fromProj: string, coordinates: Coordinates): Arrugado {
-    // 墨卡托投影的左上角坐标，对应 mapbox 左上角起始坐标 [0,0]
-    const origin = [-20037508.342789244, 20037508.342789244]
-    // 坐标转换为 Arrugator 坐标 top-left, top-left, top-left, top-left)
-    const verts = [coordinates[0], coordinates[3], coordinates[1], coordinates[2]]
-    // 转换为 EPSG:3857
-    const projector = proj4(fromProj, 'EPSG:3857').forward
-    // 改写坐标转换函数，因为 mapbox 的墨卡托坐标是 0-1，并且对应地理范围与标准 3857 不同
-    function forward(coors: [number, number]) {
-      // 墨卡托坐标
-      const coor_3857 = projector(coors)
-      // 墨卡托坐标转换到 0-1 区间，origin 对应 mapbox 0 0点
-      const mapbox_coor1 = Math.abs((coor_3857[0] - origin[0]) / (20037508.342789244 * 2))
-      const mapbox_coor2 = Math.abs((coor_3857[1] - origin[1]) / (20037508.342789244 * 2))
-      return [mapbox_coor1, mapbox_coor2]
-    }
-    const epsilon = 0.00000000001
-    // 纹理uv坐标
-    const sourceUV = [
-      [0, 0], // top-left
-      [0, 1], // bottom-left
-      [1, 0], // top-right
-      [1, 1], // bottom-right
-    ]
-    const arrugator = new Arrugator(forward, verts, sourceUV, [
-      [0, 1, 3],
-      [0, 3, 2],
-    ])
+  private _bindData(gl: WebGLRenderingContext, arrugado: ArrugadoFlat) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrugado.pos), gl.STATIC_DRAW)
 
-    arrugator.lowerEpsilon(epsilon)
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._uvBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arrugado.uv), gl.STATIC_DRAW)
 
-    return arrugator.output()
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._verticesIndexBuffer)
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(arrugado.trigs), gl.STATIC_DRAW)
   }
 
   private _loadImage(map: mapboxgl.Map, gl: WebGLRenderingContext) {

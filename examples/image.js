@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import proj4 from 'proj4'
-import ImageLayer from '../packages/image-layer/dist/es/index'
+import ImageLayer from '../packages/mapbox-gl-image-layer/dist/es'
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaHVhbmdsaWkiLCJhIjoiY2wwM2E4a2drMDVrZjNrcGRucHIxOHo0cyJ9.0ecG5KGQE6R-SmhxvLvhHg'
@@ -28,7 +28,7 @@ map.on('load', () => {
   )
 
   const layer27700 = new ImageLayer('layer-27700', {
-    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/British_National_Grid.svg/2000px-British_National_Grid.svg.png',
+    url: '/2000px-British_National_Grid.svg.png',
     projection: 'EPSG:27700',
     coordinates: [
       [0, 1300000], // top-left
@@ -39,7 +39,7 @@ map.on('load', () => {
   })
 
   const layer4326 = new ImageLayer('layer-4326', {
-    url: 'https://www.naivemap.com/mapbox-gl-js-cookbook/assets/images/4326.png',
+    url: '/4326.png',
     projection: 'EPSG:4326',
     // resampling: 'nearest',
     coordinates: [
