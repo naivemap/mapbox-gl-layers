@@ -124,6 +124,10 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
       gl.bindTexture(gl.TEXTURE_2D, this._texture)
       gl.uniform1i(gl.getUniformLocation(this._program, 'u_sampler'), 0)
 
+      // aplha
+      gl.enable(gl.BLEND)
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
       gl.drawElements(gl.TRIANGLES, this._arrugado.trigs.length, gl.UNSIGNED_SHORT, 0)
 
       gl.bindBuffer(gl.ARRAY_BUFFER, null)

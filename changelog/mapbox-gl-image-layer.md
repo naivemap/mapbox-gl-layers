@@ -1,3 +1,9 @@
+## 0.4.1
+
+### 🐞 Bug fixes
+
+- Fix transparent picture rendering exception
+
 ## 0.4.0
 
 ### ⚠️ Breaking changes
