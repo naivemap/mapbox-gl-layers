@@ -1,3 +1,9 @@
+## 0.4.2
+
+### ✨ Features
+
+- Add `opacity` option
+
 ## 0.4.1
 
 ### 🐞 Bug fixes
