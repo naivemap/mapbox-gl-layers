@@ -8,6 +8,7 @@ export type ImageOption = {
   projection: string
   coordinates: Coordinates
   resampling?: 'linear' | 'nearest'
+  opacity?: number
   crossOrigin?: string
 }
 
@@ -67,9 +68,11 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
         precision mediump float;
       #endif
       uniform sampler2D u_sampler;
+      uniform float u_opacity;
       varying vec2 v_uv;
       void main() {
-        gl_FragColor = texture2D(u_sampler, v_uv);
+        vec4 color = texture2D(u_sampler, v_uv);
+        gl_FragColor = color * u_opacity;
       }`
 
     this._program = createProgram(gl, vertexSource, fragmentSource)
@@ -124,7 +127,10 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
       gl.bindTexture(gl.TEXTURE_2D, this._texture)
       gl.uniform1i(gl.getUniformLocation(this._program, 'u_sampler'), 0)
 
-      // aplha
+      // opacity
+      gl.uniform1f(gl.getUniformLocation(this._program, 'u_opacity'), this._option.opacity || 1)
+
+      // blend
       gl.enable(gl.BLEND)
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 

@@ -42,6 +42,7 @@ map.on('load', () => {
     url: '/4326.png',
     projection: 'EPSG:4326',
     // resampling: 'nearest',
+    // opacity: 0.9,
     coordinates: [
       [105.289838, 32.204171], // top-left
       [110.195632, 32.204171], // top-right
