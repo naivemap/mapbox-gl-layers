@@ -10,7 +10,7 @@ Some implementations of mapbox's custom layer API.
 npm i @naivemap/mapbox-gl-echarts-layer echarts
 ```
 
-eg. [全国主要城市空气质量 - 百度地图](https://huanglii.github.io/mapbox-gl-js-cookbook/example/echarts-scatter.html)
+eg. [echarts-scatter](https://huanglii.github.io/mapbox-gl-js-cookbook/example/plugins-echarts-scatter.html)
 
 ### ImageLayer
 
@@ -18,7 +18,7 @@ eg. [全国主要城市空气质量 - 百度地图](https://huanglii.github.io/m
 npm i @naivemap/mapbox-gl-image-layer proj4
 ```
 
-eg. [Image of EPSG:4326](https://huanglii.github.io/mapbox-gl-js-cookbook/example/data-image-4326.html)
+eg. [image-layer](https://huanglii.github.io/mapbox-gl-js-cookbook/example/plugins-image-layer.html)
 
 ## API Reference
 
