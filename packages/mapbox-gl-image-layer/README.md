@@ -31,14 +31,26 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface
 | **option.coordinates** <br />(`Array<Array<number>>`) | Corners of image specified in longitude, latitude pairs: top left, top right, bottom right, bottom left. ref: [coordinates](https://docs.mapbox.com/mapbox-gl-js/style-spec/sources/#image-coordinates) |
 | **option.resampling** <br />(Optional `enum`. One of `"linear"`, `"nearest"`. Defaults to `"linear"`) | The resampling/interpolation method to use for overscaling, also known as texture magnification filter. ref: [raster-resampling](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-raster-raster-resampling) |
 | **option.opacity** <br />(Optional `number` between 0 and 1 inclusive. Defaults to 1. | The opacity at which the image will be drawn. |
-| **options.crossOrigin** <br />(`string`) | The crossOrigin attribute is a string which specifies the Cross-Origin Resource Sharing ([CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS)) setting to use when retrieving the image. |
+| **option.crossOrigin** <br />(`string`) | The crossOrigin attribute is a string which specifies the Cross-Origin Resource Sharing ([CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS)) setting to use when retrieving the image. |
+| **option.mask** <br />(`MaskProperty`) | The polygonal mask or multipolygonal mask for the image. |
 
 ```ts
 export type ImageOption = {
   url: string
   projection: string
   coordinates: Coordinates
-  resampling: 'linear' | 'nearest'
+  resampling?: 'linear' | 'nearest'
+  opacity?: number
+  crossOrigin?: string
+  mask?: MaskProperty
+}
+
+// top left, top right, bottom right, bottom left.
+export type Coordinates = [[number, number], [number, number], [number, number], [number, number]]
+
+export type MaskProperty = {
+  type?: 'in' | 'out' // default: in
+  data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 ```
 
@@ -46,15 +58,24 @@ export type ImageOption = {
 
 #### updateImage
 
-Updates the image URL and, optionally, the projection, the coordinates and the resampling.
+Updates the URL, the projection, the coordinates, the opacity or the resampling of the image.
 
 ```ts
 updateImage(option: {
-  url: string
+  url?: string
   projection?: string
   coordinates?: Coordinates
+  opacity?: number
   resampling?: 'linear' | 'nearest'
 }): this
+```
+
+#### updateMask
+
+Updates the mask property.
+
+```ts
+updateMask(mask: Partial<MaskProperty>): this
 ```
 
 ## Example

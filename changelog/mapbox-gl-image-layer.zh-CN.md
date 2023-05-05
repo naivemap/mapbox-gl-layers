@@ -1,3 +1,10 @@
+## 0.5.0
+
+### ✨ Features
+
+- 增加 `mask` 选项
+- 增加 `updateMask` 方法
+
 ## 0.4.2
 
 ### ✨ Features
