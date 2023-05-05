@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import proj4 from 'proj4'
-import ImageLayer from '../packages/mapbox-gl-image-layer/dist/es'
+import ImageLayer from '../packages/mapbox-gl-image-layer/lib/index'
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaHVhbmdsaWkiLCJhIjoiY2wwM2E4a2drMDVrZjNrcGRucHIxOHo0cyJ9.0ecG5KGQE6R-SmhxvLvhHg'
@@ -38,19 +38,57 @@ map.on('load', () => {
     ],
   })
 
-  const layer4326 = new ImageLayer('layer-4326', {
-    url: '/4326.png',
-    projection: 'EPSG:4326',
-    // resampling: 'nearest',
-    // opacity: 0.9,
-    coordinates: [
-      [105.289838, 32.204171], // top-left
-      [110.195632, 32.204171], // top-right
-      [110.195632, 28.164713], // bottom-right
-      [105.289838, 28.164713], // bottom-left
-    ],
-  })
+  fetch(
+    'https://fw.cqzhitian.cn/geoserver/ogc/features/collections/jcxx%3Ajjyzq_xjxzq_cq_poly/items?f=json&filter=code=500112'
+  )
+    .then((res) => res.json())
+    .then((fc) => {
+      const geometry = fc.features[0].geometry
+      console.log(geometry)
+      const layer4326 = new ImageLayer('layer-4326', {
+        url: './4326.png',
+        projection: 'EPSG:4326',
+        resampling: 'nearest',
+        opacity: 0.9,
+        coordinates: [
+          [105.289838, 32.204171], // top-left
+          [110.195632, 32.204171], // top-right
+          [110.195632, 28.164713], // bottom-right
+          [105.289838, 28.164713], // bottom-left
+        ],
+        mask: {
+          type: 'in',
+          data: geometry,
+          // data: {
+          //   "coordinates": [
+          //     [
+          //       [
+          //         106.67925655065625,
+          //         29.81876871763025
+          //       ],
+          //       [
+          //         106.67925655065625,
+          //         29.66122678892107
+          //       ],
+          //       [
+          //         106.91074940951682,
+          //         29.66122678892107
+          //       ],
+          //       [
+          //         106.91074940951682,
+          //         29.81876871763025
+          //       ],
+          //       [
+          //         106.67925655065625,
+          //         29.81876871763025
+          //       ]
+          //     ]
+          //   ],
+          //   "type": "Polygon"
+          // }
+        },
+      })
 
-  map.addLayer(layer27700, 'aeroway-line')
-  map.addLayer(layer4326, 'aeroway-line')
+      map.addLayer(layer4326)
+    })
 })
