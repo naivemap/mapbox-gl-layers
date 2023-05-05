@@ -13,10 +13,8 @@ import type { ArrugadoFlat, Coordinates } from './utils/arrugator'
 
 export type { Coordinates } from './utils/arrugator'
 
-export type MaskType = 'in' | 'out' // 内遮罩(默认)，外遮罩
-
 export type MaskProperty = {
-  type?: MaskType
+  type?: 'in' | 'out' // 内遮罩(默认)，外遮罩
   data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 
@@ -239,6 +237,7 @@ export default class ImageLayer implements mapboxgl.CustomLayerInterface {
       this.maskBufferInfo = this.getMaskBufferInfo(this.gl, this.maskProperty.data)
       this.map.triggerRepaint()
     }
+    return this
   }
 
   private loadTexture(map: mapboxgl.Map, gl: WebGLRenderingContext) {

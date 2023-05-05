@@ -1,3 +1,10 @@
+## 0.5.0
+
+### ✨ Features
+
+- Add `mask` option
+- Add `updateMask` method
+
 ## 0.4.2
 
 ### ✨ Features
