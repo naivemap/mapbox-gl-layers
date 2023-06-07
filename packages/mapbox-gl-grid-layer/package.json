@@ -1,6 +1,6 @@
 {
   "name": "@naivemap/mapbox-gl-grid-layer",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "",
   "author": "huanglii <li.huangli@qq.com>",
   "homepage": "https://github.com/naivemap/mapbox-gl-layers#readme",
@@ -25,7 +25,8 @@
     "proj4"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "alpha"
   },
   "repository": {
     "type": "git",
