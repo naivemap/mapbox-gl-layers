@@ -12,41 +12,20 @@ import { checkColorOptions, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
 
-export interface ColorOptions {
+export type ColorOptions = {
   type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
   colors: (number[] | string)[]
   values: number[]
 }
 
-export interface GridMetaData {
-  /**
-   * 像元列数，大于 0 的整数。
-   */
-  ncols: number
-  /**
-   * 像元行数，大于 0 的整数。
-   */
-  nrows: number
-  /**
-   * 像元大小，大于 0。
-   */
-  cellsize: number
-  /**
-   * 原点（左下）的 X 坐标（取决于像元的中心或左下角）
-   */
-  xll: number
-  /**
-   * 原点（左下）的 Y 坐标（取决于像元的中心或左下角）
-   */
-  yll: number
-  /**
-   * 原点（左下）坐标是像元的中心还是左下角。可选，默认值为 'center'
-   */
-  lltype?: 'center' | 'corner'
-  /**
-   * 要作为输出栅格中的 NoData 的输入值。可选，默认值为 -9999。
-   */
-  nodata_value?: number
+export type GridMetaData = {
+  ncols: number // 像元列数，大于 0 的整数。
+  nrows: number // 像元行数，大于 0 的整数。
+  cellsize: number //像元大小，大于 0。
+  xll: number // 原点（左下）的 X 坐标（取决于像元的中心或左下角）
+  yll: number // 原点（左下）的 Y 坐标（取决于像元的中心或左下角）
+  lltype?: 'center' | 'corner' // 原点（左下）坐标是像元的中心还是左下角。可选，默认值为 'center'
+  nodata_value?: number // 要作为输出栅格中的 NoData 的输入值。可选，默认值为 -9999。
 }
 
 export type MaskProperty = {
@@ -54,7 +33,7 @@ export type MaskProperty = {
   data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 
-export type GridLayerOption = {
+export type GridOption = {
   data: number[][]
   metaData: GridMetaData
   projection: string
@@ -90,7 +69,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
   private maskProgramInfo?: twgl.ProgramInfo
   private maskBufferInfo?: twgl.BufferInfo
 
-  constructor(id: string, option: GridLayerOption) {
+  constructor(id: string, option: GridOption) {
     this.id = id
     this.loaded = false
     this.data = option.data

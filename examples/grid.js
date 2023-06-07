@@ -17,32 +17,26 @@ const map = new mapboxgl.Map({
   },
 })
 
-map.on('click', (e) => {
-  console.log(e.lngLat)
-})
-
 map.on('load', () => {
   const gridLayer = new GridLayer('grid-layer', {
     data: [
-      [1, 2, 3],
-      [3, 9, 1],
-      [3, 2, 1],
+      [1, -2, 3, 5, 4],
+      [2, -9999, 2, 2, 4],
+      [3, 5, 1, 0, 0],
     ],
     projection: 'EPSG:4326',
-    gridDataOptions: {
-      xStart: 110,
-      xEnd: 112,
-      xDelta: 1,
-      xSize: 3,
-      yStart: 32,
-      yEnd: 30,
-      yDelta: -3,
-      ySize: 3,
-      noData: 9,
+    metaData: {
+      xll: 106,
+      yll: 30,
+      cellsize: 1,
+      ncols: 5,
+      nrows: 3,
+      // nodata_value: 9,
+      // lltype: 'corner'
     },
     colorOptions: {
       type: 'classified',
-      colors: ['#f00', '#0f0', '#00f'],
+      colors: ['#f00', '#0f0', '#00f', '#ff0'],
       values: [1, 2, 3],
     },
   })
