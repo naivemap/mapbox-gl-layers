@@ -1,20 +1,6 @@
 //@ts-ignore
 import { parseCSSColor } from 'csscolorparser'
 
-/**
- * CSS 颜色转 RGBA
- * @param colorString
- * @returns
- */
-export function parseColor(colorString: string) {
-  const rgba = parseCSSColor(colorString)
-  if (!rgba) {
-    return undefined
-  }
-
-  return [(rgba[0] / 255) * rgba[3], (rgba[1] / 255) * rgba[3], (rgba[2] / 255) * rgba[3], rgba[3]]
-}
-
 function getCurrentColor(value: number, values: number[], colors: any): [number, number[]] {
   for (let i = 0; i < values.length; i++) {
     if (value < values[i]) {
@@ -66,28 +52,11 @@ function interpolateColor(value: number, values: number[], colors: any) {
 }
 
 /**
- * hex 转 rgba
- * @param bgColor
- * @returns
- */
-const hexToRgba = (hex: string, alpha = 1) => {
-  const color = hex.slice(1) // 去掉'#'号
-  const rgba = [
-    parseInt('0x' + color.slice(0, 2)),
-    parseInt('0x' + color.slice(2, 4)),
-    parseInt('0x' + color.slice(4, 6)),
-    alpha,
-  ]
-
-  return rgba
-}
-
-/**
  * toRGBA
  * @param {Color} color
  * @returns [r, g, b, a]
  */
-function toRGBA(color: any) {
+function toRGBA(color: string | number[]) {
   if ('string' === typeof color) {
     const parsedColor = parseCSSColor(color)
 
