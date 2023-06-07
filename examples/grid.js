@@ -24,7 +24,7 @@ map.on('load', () => {
       [2, -9999, 2, 2, 4],
       [3, 5, 1, 0, 0],
     ],
-    projection: 'EPSG:4326',
+    // projection: 'EPSG:4326',
     metaData: {
       xll: 106,
       yll: 30,

@@ -36,8 +36,8 @@ export type MaskProperty = {
 export type GridOption = {
   data: number[][]
   metaData: GridMetaData
-  projection: string
   colorOptions: ColorOptions
+  projection?: string
   resampling?: 'linear' | 'nearest'
   opacity?: number
   mask?: MaskProperty
@@ -95,7 +95,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     const xmax = xmin + cellsize * ncols
     const ymin = lltype === 'corner' ? yll : yll - cellsize / 2
     const ymax = ymin + cellsize * nrows
-    this.arrugado = initArrugator(option.projection, [
+    this.arrugado = initArrugator(option.projection ?? 'EPSG:4326', [
       [xmin, ymax], // top-left
       [xmax, ymax], // top-right
       [xmax, ymin], // bottom-right
