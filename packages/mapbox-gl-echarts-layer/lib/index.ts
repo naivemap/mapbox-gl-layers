@@ -1,6 +1,7 @@
 import {
   init,
   registerCoordinateSystem,
+  getCoordinateSystemDimensions,
   ComposeOption,
   EffectScatterSeriesOption,
   LegendComponentOption,
@@ -21,24 +22,26 @@ export type ECOption = ComposeOption<
 const COORDINATE_SYSTEM_NAME = 'mapboxgl-echarts'
 
 class CoordinateSystem {
-  map: mapboxgl.Map
+  id: string
   dimensions = ['x', 'y']
+  private _map: mapboxgl.Map
   private _mapOffset = [0, 0]
 
-  constructor(map: mapboxgl.Map) {
-    this.map = map
+  constructor(id: string, map: mapboxgl.Map) {
+    this.id = id
+    this._map = map
   }
 
   create(ecModel: any) {
     ecModel.eachSeries((seriesModel: any) => {
-      if (seriesModel.get('coordinateSystem') === COORDINATE_SYSTEM_NAME) {
-        seriesModel.coordinateSystem = new CoordinateSystem(this.map)
+      if (seriesModel.get('coordinateSystem') === this.id) {
+        seriesModel.coordinateSystem = new CoordinateSystem(this.id, this._map)
       }
     })
   }
 
   dataToPoint(data: [number, number]) {
-    const px = this.map.project(data)
+    const px = this._map.project(data)
     const mapOffset = this._mapOffset
 
     return [px.x - mapOffset[0], px.y - mapOffset[1]]
@@ -46,7 +49,7 @@ class CoordinateSystem {
 
   pointToData(pt: [number, number]) {
     const mapOffset = this._mapOffset
-    const data = this.map.unproject([pt[0] + mapOffset[0], pt[1] + mapOffset[1]])
+    const data = this._map.unproject([pt[0] + mapOffset[0], pt[1] + mapOffset[1]])
     return [data.lng, data.lat]
   }
 
@@ -76,20 +79,23 @@ export default class EChartsLayer implements mapboxgl.CustomLayerInterface {
   private _map!: mapboxgl.Map
   private _ec: echarts.ECharts | undefined
   private _coordSystemName: string
-  private _registered = false
   private _ecOption: ECOption
 
   constructor(id: string, ecOption: ECOption) {
     this.id = id
     this.type = 'custom'
     this.renderingMode = '2d'
-    this._coordSystemName = COORDINATE_SYSTEM_NAME
+    this._coordSystemName = COORDINATE_SYSTEM_NAME + '-' + Math.random().toString(16).substring(2)
     this._ecOption = ecOption
   }
 
   onAdd(map: mapboxgl.Map) {
     this._map = map
     this._createLayerContainer()
+    if (!getCoordinateSystemDimensions(this._coordSystemName)) {
+      const coordinateSystem = new CoordinateSystem(this._coordSystemName, this._map)
+      registerCoordinateSystem(this._coordSystemName, coordinateSystem as any)
+    }
   }
 
   onRemove() {
@@ -123,11 +129,6 @@ export default class EChartsLayer implements mapboxgl.CustomLayerInterface {
   }
 
   private _prepareECharts() {
-    if (!this._registered) {
-      const coordinateSystem = new CoordinateSystem(this._map)
-      registerCoordinateSystem(this._coordSystemName, coordinateSystem as any)
-      this._registered = true
-    }
     const series = this._ecOption.series as any[]
     if (series) {
       for (let i = series.length - 1; i >= 0; i--) {
