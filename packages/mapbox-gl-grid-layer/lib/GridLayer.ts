@@ -12,7 +12,7 @@ import { checkColorOptions, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
 
-export type ColorOptions = {
+export type ColorOption = {
   type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
   colors: (number[] | string)[]
   values: number[]
@@ -41,7 +41,7 @@ export type GridData = {
 
 export type GridOption = {
   data: GridData
-  colorOptions: ColorOptions
+  colorOption: ColorOption
   resampling?: 'linear' | 'nearest'
   opacity?: number
   mask?: MaskProperty
@@ -56,7 +56,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
   private gl?: WebGLRenderingContext
 
   private data: GridData
-  private colorOptions!: ColorOptions
+  private colorOption!: ColorOption
   private opacity: number
 
   private loaded: boolean
@@ -79,9 +79,9 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     this.opacity = option.opacity ?? 1
     this.maskProperty = Object.assign({ type: 'in' }, option.mask)
 
-    // 检查 colorOptions
-    if (checkColorOptions(option.colorOptions)) {
-      this.colorOptions = option.colorOptions
+    // 检查 colorOption
+    if (checkColorOptions(option.colorOption)) {
+      this.colorOption = option.colorOption
     }
 
     // 检查 stencil 是否可用
@@ -209,6 +209,34 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     }
   }
 
+  // /**
+  //  * Updates the data
+  //  * @param {GridData} data data.
+  //  */
+  // updateData(data: Partial<GridData>) {
+  //   if (this.gl && this.map) {
+  //   }
+  //   return this
+  // }
+
+  /**
+   * Updates the colorOption
+   * @param {ColorOption} option colorOption.
+   */
+  updateColorOption(option: Partial<ColorOption>) {
+    if (this.gl && this.map) {
+      const opt = Object.assign({}, this.colorOption, option)
+      // check colorOption
+      if (checkColorOptions(opt)) {
+        this.colorOption = opt
+      }
+      this.loaded = false
+      if (this.texture) this.gl.deleteTexture(this.texture)
+      this.loadTexture(this.map, this.gl)
+    }
+    return this
+  }
+
   /**
    * Updates the mask property
    * @param {MaskProperty} mask The mask property.
@@ -227,9 +255,9 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
 
   private loadTexture(map: mapboxgl.Map, gl: WebGLRenderingContext) {
     // 创建纹理
-    const filter = this.colorOptions.type === 'stretched' ? gl.LINEAR : gl.NEAREST
+    const filter = this.colorOption.type === 'stretched' ? gl.LINEAR : gl.NEAREST
     const { data, metadata } = this.data
-    const imageData = getImageData(data, metadata, this.colorOptions)
+    const imageData = getImageData(data, metadata, this.colorOption)
     this.texture = twgl.createTexture(gl, {
       width: metadata.ncols,
       height: metadata.nrows,

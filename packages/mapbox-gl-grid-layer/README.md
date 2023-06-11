@@ -27,7 +27,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface
 | Name | Description |
 | --- | --- |
 | **option.data** <br />(`GridData`) | The grid data. |
-| **option.colorOptions** <br />(`ColorOptions`) | The color options used to render the grid. |
+| **option.colorOption** <br />(`ColorOption`) | The color options used to render the grid. |
 | **option.resampling** <br />(Optional `enum`. One of `"linear"`, `"nearest"`. Defaults to `"linear"`) | The resampling/interpolation method to use for overscaling, also known as texture magnification filter. ref: [raster-resampling](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-raster-raster-resampling) |
 | **option.opacity** <br />(Optional `number` between 0 and 1 inclusive. Defaults to 1. | The opacity at which the grid will be drawn. |
 | **option.mask** <br />(`MaskProperty`) | The polygonal mask or multipolygonal mask for the grid. |
@@ -35,7 +35,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface
 ```ts
 export type GridOption = {
   data: GridData
-  colorOptions: ColorOptions
+  colorOption: ColorOption
   resampling?: 'linear' | 'nearest'
   opacity?: number
   mask?: MaskProperty
@@ -57,7 +57,7 @@ export type Metadata = {
   projection?: string // Projection with EPSG code. Defaults to `'EPSG:4326'`.
 }
 
-export type ColorOptions = {
+export type ColorOption = {
   type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
   colors: (number[] | string)[]
   values: number[]
@@ -70,6 +70,22 @@ export type MaskProperty = {
 ```
 
 ### Methods
+
+#### updateColorOption
+
+Updates the colorOption.
+
+````ts
+updateColorOption(option: Partial<ColorOption>): this
+``
+
+#### updateMask
+
+Updates the mask property.
+
+```ts
+updateMask(mask: Partial<MaskProperty>): this
+````
 
 ## Example
 
@@ -89,7 +105,7 @@ const gridLayer = new GridLayer('grid-layer', {
       nrows: 3,
     },
   },
-  colorOptions: {
+  colorOption: {
     type: 'classified',
     colors: ['#f00', '#0f0', '#00f', '#ff0'],
     values: [1, 2, 3],
