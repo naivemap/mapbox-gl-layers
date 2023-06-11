@@ -1,4 +1,4 @@
-import type { ColorOptions, GridMetaData } from '../GridLayer'
+import type { ColorOption, Metadata } from '../GridLayer'
 import { interpolateColor, toRGBA } from './color'
 
 /**
@@ -6,7 +6,7 @@ import { interpolateColor, toRGBA } from './color'
  * @param options
  * @returns
  */
-export function checkColorOptions(options: ColorOptions) {
+export function checkColorOptions(options: ColorOption) {
   const { type, values, colors } = options
   if (type === 'classified') {
     if (values.length + 1 === colors.length) {
@@ -32,7 +32,7 @@ export function checkColorOptions(options: ColorOptions) {
  * @param colorOptions
  * @returns
  */
-export function getImageData(data: number[][], metaData: GridMetaData, colorOptions: ColorOptions) {
+export function getImageData(data: number[][], metaData: Metadata, colorOptions: ColorOption) {
   const { ncols, nrows, nodata_value = -9999 } = metaData
   const { type, values, colors } = colorOptions
 
