@@ -18,7 +18,7 @@ export type ColorOptions = {
   values: number[]
 }
 
-export type GridMetaData = {
+export type Metadata = {
   ncols: number // 像元列数，大于 0 的整数。
   nrows: number // 像元行数，大于 0 的整数。
   cellsize: number //像元大小，大于 0。
@@ -26,6 +26,7 @@ export type GridMetaData = {
   yll: number // 原点（左下）的 Y 坐标（取决于像元的中心或左下角）
   lltype?: 'center' | 'corner' // 原点（左下）坐标是像元的中心还是左下角。可选，默认值为 'center'
   nodata_value?: number // 要作为输出栅格中的 NoData 的输入值。可选，默认值为 -9999。
+  projection?: string
 }
 
 export type MaskProperty = {
@@ -33,11 +34,14 @@ export type MaskProperty = {
   data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 
-export type GridOption = {
+export type GridData = {
   data: number[][]
-  metaData: GridMetaData
+  metadata: Metadata
+}
+
+export type GridOption = {
+  data: GridData
   colorOptions: ColorOptions
-  projection?: string
   resampling?: 'linear' | 'nearest'
   opacity?: number
   mask?: MaskProperty
@@ -51,8 +55,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
   private map?: mapboxgl.Map
   private gl?: WebGLRenderingContext
 
-  private data: number[][]
-  private metaData: GridMetaData
+  private data: GridData
   private colorOptions!: ColorOptions
   private opacity: number
 
@@ -73,7 +76,6 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     this.id = id
     this.loaded = false
     this.data = option.data
-    this.metaData = option.metaData
     this.opacity = option.opacity ?? 1
     this.maskProperty = Object.assign({ type: 'in' }, option.mask)
 
@@ -90,12 +92,12 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     }
 
     // 初始化 Arrugator
-    const { xll, yll, cellsize, lltype, ncols, nrows } = option.metaData
+    const { xll, yll, cellsize, lltype, ncols, nrows, projection } = option.data.metadata
     const xmin = lltype === 'corner' ? xll : xll - cellsize / 2
     const xmax = xmin + cellsize * ncols
     const ymin = lltype === 'corner' ? yll : yll - cellsize / 2
     const ymax = ymin + cellsize * nrows
-    this.arrugado = initArrugator(option.projection ?? 'EPSG:4326', [
+    this.arrugado = initArrugator(projection ?? 'EPSG:4326', [
       [xmin, ymax], // top-left
       [xmax, ymax], // top-right
       [xmax, ymin], // bottom-right
@@ -212,7 +214,10 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
    * @param {MaskProperty} mask The mask property.
    */
   updateMask(mask: Partial<MaskProperty>) {
-    if (this.gl && this.map && this.maskProgramInfo) {
+    if (this.gl && this.map) {
+      if (!this.maskProgramInfo) {
+        this.maskProgramInfo = twgl.createProgramInfo(this.gl, [maskvs, maskfs])
+      }
       this.maskProperty = Object.assign(this.maskProperty, mask)
       this.maskBufferInfo = this.getMaskBufferInfo(this.gl, this.maskProperty.data)
       this.map.triggerRepaint()
@@ -223,10 +228,11 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
   private loadTexture(map: mapboxgl.Map, gl: WebGLRenderingContext) {
     // 创建纹理
     const filter = this.colorOptions.type === 'stretched' ? gl.LINEAR : gl.NEAREST
-    const imageData = getImageData(this.data, this.metaData, this.colorOptions)
+    const { data, metadata } = this.data
+    const imageData = getImageData(data, metadata, this.colorOptions)
     this.texture = twgl.createTexture(gl, {
-      width: this.metaData.ncols,
-      height: this.metaData.nrows,
+      width: metadata.ncols,
+      height: metadata.nrows,
       src: imageData as number[],
       minMag: filter,
       flipY: 1,

@@ -26,9 +26,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface
 
 | Name | Description |
 | --- | --- |
-| **option.data** <br />(`number[][]`) | The grid data. |
-| **option.metaData** <br />(`string`) | The metadata of the grid. |
-| **option.projection** <br />(Optional `string`) | Projection with EPSG code. Defaults to `'EPSG:4326'`. |
+| **option.data** <br />(`GridData`) | The grid data. |
 | **option.colorOptions** <br />(`ColorOptions`) | The color options used to render the grid. |
 | **option.resampling** <br />(Optional `enum`. One of `"linear"`, `"nearest"`. Defaults to `"linear"`) | The resampling/interpolation method to use for overscaling, also known as texture magnification filter. ref: [raster-resampling](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-raster-raster-resampling) |
 | **option.opacity** <br />(Optional `number` between 0 and 1 inclusive. Defaults to 1. | The opacity at which the grid will be drawn. |
@@ -36,16 +34,19 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface
 
 ```ts
 export type GridOption = {
-  data: number[][]
-  metaData: GridMetaData
-  projection: string
+  data: GridData
   colorOptions: ColorOptions
   resampling?: 'linear' | 'nearest'
   opacity?: number
   mask?: MaskProperty
 }
 
-export type GridMetaData = {
+export type GridData = {
+  data: number[][]
+  metadata: Metadata
+}
+
+export type Metadata = {
   ncols: number // Number of cell columns
   nrows: number // Number of cell rows
   cellsize: number // Cell size
@@ -53,17 +54,18 @@ export type GridMetaData = {
   yll: number // Y-coordinate of the origin (by center or lower left corner of the cell)
   lltype?: 'center' | 'corner' // Is the origin the center or corner of the cell. Defaults to 'center'
   nodata_value?: number // The input values to be NoData in the output raster。Defaults to -9999.。
-}
-
-export type MaskProperty = {
-  type?: 'in' | 'out' // Default is 'in'
-  data: GeoJSON.Polygon | GeoJSON.MultiPolygon
+  projection?: string // Projection with EPSG code. Defaults to `'EPSG:4326'`.
 }
 
 export type ColorOptions = {
   type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
   colors: (number[] | string)[]
   values: number[]
+}
+
+export type MaskProperty = {
+  type?: 'in' | 'out' // Default is 'in'
+  data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 ```
 
@@ -73,18 +75,19 @@ export type ColorOptions = {
 
 ```ts
 const gridLayer = new GridLayer('grid-layer', {
-  data: [
-    [1, -2, 3, 5, 4],
-    [2, -9999, 2, 2, 4],
-    [3, 5, 1, 0, 0],
-  ],
-  projection: 'EPSG:4326',
-  metaData: {
-    xll: 106,
-    yll: 30,
-    cellsize: 1,
-    ncols: 5,
-    nrows: 3,
+  data: {
+    data: [
+      [1, -2, 3, 5, 4],
+      [2, -9999, 2, 2, 4],
+      [3, 5, 1, 0, 0],
+    ],
+    metadata: {
+      xll: 106,
+      yll: 30,
+      cellsize: 1,
+      ncols: 5,
+      nrows: 3,
+    },
   },
   colorOptions: {
     type: 'classified',
