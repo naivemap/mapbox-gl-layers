@@ -230,7 +230,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     if (this.gl && this.map) {
       const opt = Object.assign({}, this.colorOption, option)
       // check colorOption
-      if (checkColorOptions(opt)) {
+      if (checkColorOption(opt)) {
         this.colorOption = opt
       }
       this.loaded = false
