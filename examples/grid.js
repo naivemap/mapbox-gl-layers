@@ -19,22 +19,23 @@ const map = new mapboxgl.Map({
 
 map.on('load', () => {
   const gridLayer = new GridLayer('grid-layer', {
-    data: [
-      [1, -2, 3, 5, 4],
-      [2, -9999, 2, 2, 4],
-      [3, 5, 1, 0, 0],
-    ],
-    // projection: 'EPSG:4326',
-    metaData: {
-      xll: 106,
-      yll: 30,
-      cellsize: 1,
-      ncols: 5,
-      nrows: 3,
-      // nodata_value: 9,
-      // lltype: 'corner'
+    data: {
+      data: [
+        [1, -2, 3, 5, 4],
+        [2, -9999, 2, 2, 4],
+        [3, 5, 1, 0, 0],
+      ],
+      metadata: {
+        xll: 106,
+        yll: 30,
+        cellsize: 1,
+        ncols: 5,
+        nrows: 3,
+        // nodata_value: 9,
+        // lltype: 'corner'
+      },
     },
-    colorOptions: {
+    colorOption: {
       type: 'classified',
       colors: ['#f00', '#0f0', '#00f', '#ff0'],
       values: [1, 2, 3],

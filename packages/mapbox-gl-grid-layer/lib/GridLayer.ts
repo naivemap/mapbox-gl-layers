@@ -8,7 +8,7 @@ import vs from './shaders/grid.vertex.glsl'
 import maskfs from './shaders/mask.fragment.glsl'
 import maskvs from './shaders/mask.vertex.glsl'
 
-import { checkColorOptions, getImageData } from './utils'
+import { checkColorOption, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
 
@@ -57,6 +57,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
 
   private data: GridData
   private colorOption!: ColorOption
+  private resampling: 'linear' | 'nearest'
   private opacity: number
 
   private loaded: boolean
@@ -80,9 +81,11 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     this.maskProperty = Object.assign({ type: 'in' }, option.mask)
 
     // 检查 colorOption
-    if (checkColorOptions(option.colorOption)) {
+    if (checkColorOption(option.colorOption)) {
       this.colorOption = option.colorOption
     }
+    this.resampling =
+      option.resampling ?? (this.colorOption.type === 'stretched' ? 'linear' : 'nearest')
 
     // 检查 stencil 是否可用
     this.stencilChecked = satisfies(mapboxgl.version, '>=2.7.0')
@@ -255,7 +258,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
 
   private loadTexture(map: mapboxgl.Map, gl: WebGLRenderingContext) {
     // 创建纹理
-    const filter = this.colorOption.type === 'stretched' ? gl.LINEAR : gl.NEAREST
+    const filter = this.resampling === 'linear' ? gl.LINEAR : gl.NEAREST
     const { data, metadata } = this.data
     const imageData = getImageData(data, metadata, this.colorOption)
     this.texture = twgl.createTexture(gl, {

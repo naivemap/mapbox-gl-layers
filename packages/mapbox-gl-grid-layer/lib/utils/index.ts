@@ -2,12 +2,12 @@ import type { ColorOption, Metadata } from '../GridLayer'
 import { interpolateColor, toRGBA } from './color'
 
 /**
- * 检查 ColorOptions
- * @param options
+ * 检查 ColorOption
+ * @param option
  * @returns
  */
-export function checkColorOptions(options: ColorOption) {
-  const { type, values, colors } = options
+export function checkColorOption(option: ColorOption) {
+  const { type, values, colors } = option
   if (type === 'classified') {
     if (values.length + 1 === colors.length) {
       return true
