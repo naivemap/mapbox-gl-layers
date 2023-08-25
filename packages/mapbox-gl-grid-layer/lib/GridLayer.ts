@@ -11,10 +11,11 @@ import maskvs from './shaders/mask.vertex.glsl'
 import { checkColorOption, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
+import type { Color, ColorType } from './ColorRamp'
 
 export type ColorOption = {
-  type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
-  colors: (number[] | string)[]
+  type: ColorType
+  colors: Color[]
   values: number[]
 }
 

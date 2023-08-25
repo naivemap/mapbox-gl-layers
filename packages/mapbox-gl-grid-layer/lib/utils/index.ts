@@ -1,5 +1,5 @@
 import type { ColorOption, Metadata } from '../GridLayer'
-import { interpolateColor, toRGBA } from './color'
+import ColorRamp from '../ColorRamp'
 
 /**
  * 检查 ColorOption
@@ -34,34 +34,14 @@ export function checkColorOption(option: ColorOption) {
  */
 export function getImageData(data: number[][], metaData: Metadata, colorOptions: ColorOption) {
   const { ncols, nrows, nodata_value = -9999 } = metaData
-  const { type, values, colors } = colorOptions
 
   const imageData: number[] = []
+  const colorRamp = new ColorRamp(colorOptions)
+
   for (let i = 0; i < nrows; i++) {
     for (let j = 0; j < ncols; j++) {
-      let color: number[] = [0, 0, 0, 0]
       const value = data[i][j]
-      if (value != nodata_value) {
-        if (type === 'stretched') {
-          // 拉伸
-          color = interpolateColor(value, values, colors)
-        } else if (type === 'classified') {
-          for (let i = 0, len = values.length; i < len; i++) {
-            if (value <= values[i]) {
-              color = toRGBA(colors[i])
-              break
-            }
-            if (i === len - 1) {
-              color = toRGBA(colors[len])
-            }
-          }
-        } else if (type === 'unique') {
-          // 唯一值
-          if (values.indexOf(value) > -1) {
-            color = toRGBA(colors[values.indexOf(value)])
-          }
-        }
-      }
+      const color = value != nodata_value ? colorRamp.pick(value) : [0, 0, 0, 0]
       imageData.push(color[0], color[1], color[2], color[3] * 255)
     }
   }
