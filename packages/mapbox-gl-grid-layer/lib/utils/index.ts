@@ -1,5 +1,5 @@
 import type { ColorOption, Metadata } from '../GridLayer'
-import ColorRamp from '../ColorRamp'
+import ColorRamp from '../color/ColorRamp'
 
 /**
  * 检查 ColorOption
@@ -9,11 +9,11 @@ import ColorRamp from '../ColorRamp'
 export function checkColorOption(option: ColorOption) {
   const { type, values, colors } = option
   if (type === 'classified') {
-    if (values.length + 1 === colors.length) {
+    if (values.length - 1 === colors.length) {
       return true
     } else {
       throw new Error(
-        'The length of colors must be greater than the length of values by 1 when the type of ColorOptions is classified.'
+        'The length of colors must be less than the length of values by 1 when the type of ColorOptions is classified.'
       )
     }
   } else {
@@ -40,7 +40,8 @@ export function getImageData(data: number[][], metaData: Metadata, colorOptions:
 
   for (let i = 0; i < nrows; i++) {
     for (let j = 0; j < ncols; j++) {
-      const value = data[i][j]
+      // 坐标原点在左下角，而数据数组在左上角
+      const value = data[nrows - 1 - i][j]
       const color = value != nodata_value ? colorRamp.pick(value) : [0, 0, 0, 0]
       imageData.push(color[0], color[1], color[2], color[3] * 255)
     }

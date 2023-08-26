@@ -1,7 +1,14 @@
 //@ts-ignore
 import { parseCSSColor } from 'csscolorparser'
-import { ColorOption } from './GridLayer'
+import { ColorOption } from '../GridLayer'
+import ColorClass from './ColorClass'
 
+export enum BOUNDS_TYPE {
+  INCLUDE_MIN_AND_MAX, // min <= value <= max
+  INCLUDE_MAX, // min < value <= max
+  INCLUDE_MIN, // min <= value < max
+  EXCLUSIVE, // min < value < max
+}
 export type RGBA = [number, number, number, number]
 export type Color = [number, number, number, number] | string
 export type ColorType = 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
@@ -10,11 +17,21 @@ export default class ColorRamp {
   type: ColorType
   values: number[]
   colors: RGBA[]
+  colorClasses?: ColorClass[]
+  boundsType: BOUNDS_TYPE
 
   constructor(option: ColorOption) {
-    this.type = option.type
-    this.values = option.values
-    this.colors = option.colors.map((item) => this.toRGBA(item))
+    const { type, values, colors } = option
+    this.type = type
+    this.values = values
+    this.colors = colors.map((item) => this.toRGBA(item))
+    this.boundsType = option.boundsType ?? BOUNDS_TYPE.INCLUDE_MAX
+
+    if (type === 'classified') {
+      this.colorClasses = this.colors.map((item, i) => {
+        return new ColorClass(values[i], values[i + 1], item)
+      })
+    }
   }
 
   pick(value: number) {
@@ -27,13 +44,10 @@ export default class ColorRamp {
         color = colors[values.indexOf(value)]
       }
     } else if (type === 'classified') {
-      for (let i = 0, len = values.length; i < len; i++) {
-        if (value <= values[i]) {
-          color = colors[i]
+      for (let i = 0, len = colors.length; i < len; i++) {
+        if (this.colorClasses![i].contains(value, this.boundsType)) {
+          color = this.colorClasses![i].color
           break
-        }
-        if (i === len - 1) {
-          color = colors[len]
         }
       }
     } else if (type === 'stretched') {
