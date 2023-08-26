@@ -58,14 +58,25 @@ export type Metadata = {
 }
 
 export type ColorOption = {
-  type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
-  colors: (number[] | string)[]
+  type: ColorType
+  colors: Color[]
   values: number[]
+  boundsType?: BOUNDS_TYPE
 }
 
 export type MaskProperty = {
   type?: 'in' | 'out' // Default is 'in'
   data: GeoJSON.Polygon | GeoJSON.MultiPolygon
+}
+
+export type ColorType = 'unique' | 'classified' | 'stretched'
+export type Color = [number, number, number, number] | string
+
+export enum BOUNDS_TYPE {
+  INCLUDE_MIN_AND_MAX, // min <= value <= max
+  INCLUDE_MAX, // min < value <= max
+  INCLUDE_MIN, // min <= value < max
+  EXCLUSIVE, // min < value < max
 }
 ```
 
@@ -75,9 +86,9 @@ export type MaskProperty = {
 
 Updates the colorOption.
 
-````ts
+```ts
 updateColorOption(option: Partial<ColorOption>): this
-``
+```
 
 #### updateMask
 
@@ -85,7 +96,7 @@ Updates the mask property.
 
 ```ts
 updateMask(mask: Partial<MaskProperty>): this
-````
+```
 
 ## Example
 
@@ -108,7 +119,7 @@ const gridLayer = new GridLayer('grid-layer', {
   colorOption: {
     type: 'classified',
     colors: ['#f00', '#0f0', '#00f', '#ff0'],
-    values: [1, 2, 3],
+    values: [1, 2, 3, 4, 5],
   },
 })
 

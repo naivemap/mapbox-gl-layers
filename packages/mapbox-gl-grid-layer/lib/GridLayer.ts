@@ -11,7 +11,8 @@ import maskvs from './shaders/mask.vertex.glsl'
 import { checkColorOption, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
-import type { BOUNDS_TYPE, Color, ColorType } from './color/ColorRamp'
+import type { Color, ColorType } from './color/ColorRamp'
+import { BOUNDS_TYPE } from './color/ClassifiedColor'
 
 export type ColorOption = {
   type: ColorType

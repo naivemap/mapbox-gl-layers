@@ -1,8 +1,15 @@
-import { BOUNDS_TYPE, RGBA } from './ColorRamp'
+import { RGBA } from './ColorRamp'
 
-export default class ColorClass {
-  min: number
-  max: number
+export enum BOUNDS_TYPE {
+  INCLUDE_MIN_AND_MAX, // min <= value <= max
+  INCLUDE_MAX, // min < value <= max
+  INCLUDE_MIN, // min <= value < max
+  EXCLUSIVE, // min < value < max
+}
+
+export default class ClassifiedColor {
+  private min: number
+  private max: number
   color: RGBA
 
   constructor(min: number, max: number, color: RGBA) {

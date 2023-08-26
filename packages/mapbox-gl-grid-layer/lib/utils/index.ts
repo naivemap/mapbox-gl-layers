@@ -1,5 +1,20 @@
+//@ts-ignore
+import { parseCSSColor } from 'csscolorparser'
 import type { ColorOption, Metadata } from '../GridLayer'
-import ColorRamp from '../color/ColorRamp'
+import ColorRamp, { Color, RGBA } from '../color/ColorRamp'
+
+export function toRGBA(color: Color): RGBA {
+  if ('string' === typeof color) {
+    const parsedColor = parseCSSColor(color)
+
+    if (parsedColor) {
+      return parsedColor
+    } else {
+      throw new Error(`Invalide color: "${color}"`)
+    }
+  }
+  return color
+}
 
 /**
  * 检查 ColorOption
