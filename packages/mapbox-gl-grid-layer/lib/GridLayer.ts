@@ -11,10 +11,13 @@ import maskvs from './shaders/mask.vertex.glsl'
 import { checkColorOption, getImageData } from './utils'
 import { initArrugator } from './utils/arrugator'
 import type { ArrugadoFlat } from './utils/arrugator'
+import type { Color, ColorType } from './color/ColorRamp'
+import { BOUNDS_TYPE } from './color/ClassifiedColor'
 
 export type ColorOption = {
-  type: 'unique' | 'classified' | 'stretched' // 唯一值 | 分类 | 拉伸
-  colors: (number[] | string)[]
+  type: ColorType
+  boundsType?: BOUNDS_TYPE
+  colors: Color[]
   values: number[]
 }
 
@@ -260,6 +263,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     // 创建纹理
     const filter = this.resampling === 'linear' ? gl.LINEAR : gl.NEAREST
     const { data, metadata } = this.data
+    // 左下角坐标，所以需要将数据翻转一下
     const imageData = getImageData(data, metadata, this.colorOption)
     this.texture = twgl.createTexture(gl, {
       width: metadata.ncols,
