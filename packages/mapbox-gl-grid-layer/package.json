@@ -1,7 +1,7 @@
 {
   "name": "@naivemap/mapbox-gl-grid-layer",
-  "version": "0.2.0-beta.0",
-  "description": "",
+  "version": "0.2.0",
+  "description": "Render colorful grid data.",
   "author": "huanglii <li.huangli@qq.com>",
   "homepage": "https://github.com/naivemap/mapbox-gl-layers#readme",
   "license": "MIT",
@@ -25,8 +25,7 @@
     "proj4"
   ],
   "publishConfig": {
-    "access": "public",
-    "tag": "beta"
+    "access": "public"
   },
   "repository": {
     "type": "git",
