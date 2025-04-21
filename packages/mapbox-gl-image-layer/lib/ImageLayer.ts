@@ -1,67 +1,40 @@
 import { satisfies } from 'compare-versions'
-import earcut from 'earcut'
+import earcut, { flatten } from 'earcut'
 import mapboxgl from 'mapbox-gl'
 import * as twgl from 'twgl.js'
-
-import fs from './shaders/grid.fragment.glsl'
-import vs from './shaders/grid.vertex.glsl'
+import type { ArrugadoFlat, Coordinates } from './arrugator'
+import { initArrugator } from './arrugator'
+import fs from './shaders/image.fragment.glsl'
+import vs from './shaders/image.vertex.glsl'
 import maskfs from './shaders/mask.fragment.glsl'
 import maskvs from './shaders/mask.vertex.glsl'
 
-import { checkColorOption, getImageData } from './utils'
-import { initArrugator } from './utils/arrugator'
-import type { ArrugadoFlat } from './utils/arrugator'
-import type { Color, ColorType } from './color/ColorRamp'
-import { BOUNDS_TYPE } from './color/ClassifiedColor'
-
-export type ColorOption = {
-  type: ColorType
-  boundsType?: BOUNDS_TYPE
-  colors: Color[]
-  values: number[]
-}
-
-export type Metadata = {
-  ncols: number // 像元列数，大于 0 的整数。
-  nrows: number // 像元行数，大于 0 的整数。
-  cellsize: number //像元大小，大于 0。
-  xll: number // 原点（左下）的 X 坐标（取决于像元的中心或左下角）
-  yll: number // 原点（左下）的 Y 坐标（取决于像元的中心或左下角）
-  lltype?: 'center' | 'corner' // 原点（左下）坐标是像元的中心还是左下角。可选，默认值为 'center'
-  nodata_value?: number // 要作为输出栅格中的 NoData 的输入值。可选，默认值为 -9999。
-  projection?: string
-}
-
 export type MaskProperty = {
-  type?: 'in' | 'out' // 内遮罩（默认），外遮罩
+  type?: 'in' | 'out' // 内遮罩(默认)，外遮罩
   data: GeoJSON.Polygon | GeoJSON.MultiPolygon
 }
 
-export type GridData = {
-  data: number[][]
-  metadata: Metadata
-}
-
-export type GridOption = {
-  data: GridData
-  colorOption: ColorOption
+export type ImageOption = {
+  url: string
+  projection: string
+  coordinates: Coordinates
   resampling?: 'linear' | 'nearest'
   opacity?: number
+  crossOrigin?: string
+  arrugatorStep?: number
   mask?: MaskProperty
+  metadata?: any
 }
 
-export default class GridLayer implements mapboxgl.CustomLayerInterface {
+export default class ImageLayer implements mapboxgl.CustomLayerInterface {
   id: string
   type: 'custom' = 'custom' as const
   renderingMode?: '2d' | '3d' | undefined = '2d'
+  metadata?: any
+  private option: ImageOption
 
   private map?: mapboxgl.Map
   private gl?: WebGLRenderingContext
-
-  private data: GridData
-  private colorOption!: ColorOption
-  private resampling: 'linear' | 'nearest'
-  private opacity: number
 
   private loaded: boolean
   private arrugado: ArrugadoFlat
@@ -76,19 +49,13 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
   private maskProgramInfo?: twgl.ProgramInfo
   private maskBufferInfo?: twgl.BufferInfo
 
-  constructor(id: string, option: GridOption) {
+  constructor(id: string, option: ImageOption) {
     this.id = id
+    this.option = option
     this.loaded = false
-    this.data = option.data
-    this.opacity = option.opacity ?? 1
     this.maskProperty = Object.assign({ type: 'in' }, option.mask)
 
-    // 检查 colorOption
-    if (checkColorOption(option.colorOption)) {
-      this.colorOption = option.colorOption
-    }
-    this.resampling =
-      option.resampling ?? (this.colorOption.type === 'stretched' ? 'linear' : 'nearest')
+    this.metadata = option.metadata
 
     // 检查 stencil 是否可用
     this.stencilChecked = satisfies(mapboxgl.version, '>=2.7.0')
@@ -98,17 +65,8 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     }
 
     // 初始化 Arrugator
-    const { xll, yll, cellsize, lltype, ncols, nrows, projection } = option.data.metadata
-    const xmin = lltype === 'corner' ? xll : xll - cellsize / 2
-    const xmax = xmin + cellsize * ncols
-    const ymin = lltype === 'corner' ? yll : yll - cellsize / 2
-    const ymax = ymin + cellsize * nrows
-    this.arrugado = initArrugator(projection ?? 'EPSG:4326', [
-      [xmin, ymax], // top-left
-      [xmax, ymax], // top-right
-      [xmax, ymin], // bottom-right
-      [xmin, ymin], // bottom-left
-    ])
+    const { projection, coordinates } = option
+    this.arrugado = initArrugator(projection, coordinates, option.arrugatorStep)
   }
 
   onAdd(map: mapboxgl.Map, gl: WebGLRenderingContext) {
@@ -135,7 +93,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     }
   }
 
-  onRemove(map: mapboxgl.Map, gl: WebGLRenderingContext) {
+  onRemove(_: mapboxgl.Map, gl: WebGLRenderingContext) {
     if (this.programInfo) {
       gl.deleteProgram(this.programInfo.program)
     }
@@ -202,7 +160,7 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
       // uniforms
       twgl.setUniforms(this.programInfo, {
         u_matrix: matrix,
-        u_opacity: this.opacity || 1,
+        u_opacity: this.option.opacity ?? 1,
         u_sampler: this.texture,
       })
       // pos, uv & indices
@@ -215,30 +173,48 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
     }
   }
 
-  // /**
-  //  * Updates the data
-  //  * @param {GridData} data data.
-  //  */
-  // updateData(data: Partial<GridData>) {
-  //   if (this.gl && this.map) {
-  //   }
-  //   return this
-  // }
-
   /**
-   * Updates the colorOption
-   * @param {ColorOption} option colorOption.
+   * Updates the URL, the projection, the coordinates, the opacity or the resampling of the image.
+   * @param {Object} option Options object.
+   * @param {string} [option.url] Image URL.
+   * @param {string} [option.projection] Projection with EPSG code that points to the image..
+   * @param {Array<Array<number>>} [option.coordinates] Four geographical coordinates,
+   * @param {number} [option.opacity] opacity of the image.
+   * @param {string} [option.resampling] The resampling/interpolation method to use for overscaling.
    */
-  updateColorOption(option: Partial<ColorOption>) {
+  updateImage(option: {
+    url?: string
+    projection?: string
+    coordinates?: Coordinates
+    opacity?: number
+    resampling?: 'linear' | 'nearest'
+  }) {
     if (this.gl && this.map) {
-      const opt = Object.assign({}, this.colorOption, option)
-      // check colorOption
-      if (checkColorOption(opt)) {
-        this.colorOption = opt
+      this.option.opacity = option.opacity ?? this.option.opacity
+      if (option.projection || option.coordinates) {
+        this.option.projection = option.projection ?? this.option.projection
+        this.option.coordinates = option.coordinates ?? this.option.coordinates
+        // reinit arrugator
+        this.arrugado = initArrugator(
+          this.option.projection,
+          this.option.coordinates,
+          this.option.arrugatorStep
+        )
+        this.bufferInfo = twgl.createBufferInfoFromArrays(this.gl, {
+          a_pos: { numComponents: 2, data: this.arrugado.pos },
+          a_uv: { numComponents: 2, data: this.arrugado.uv },
+          indices: this.arrugado.trigs,
+        })
       }
-      this.loaded = false
-      if (this.texture) this.gl.deleteTexture(this.texture)
-      this.loadTexture(this.map, this.gl)
+      if (option.url || option.resampling) {
+        this.loaded = false
+        this.option.url = option.url ?? this.option.url
+        this.option.resampling = option.resampling ?? this.option.resampling
+        // reload image
+        this.loadTexture(this.map, this.gl)
+      } else {
+        this.map.triggerRepaint()
+      }
     }
     return this
   }
@@ -249,11 +225,18 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
    */
   updateMask(mask: Partial<MaskProperty>) {
     if (this.gl && this.map) {
-      if (!this.maskProgramInfo) {
-        this.maskProgramInfo = twgl.createProgramInfo(this.gl, [maskvs, maskfs])
+      if (mask.data) {
+        if (!this.maskProgramInfo) {
+          this.maskProgramInfo = twgl.createProgramInfo(this.gl, [maskvs, maskfs])
+        }
+
+        this.maskProperty = Object.assign(this.maskProperty, mask)
+        this.maskBufferInfo = this.getMaskBufferInfo(this.gl, this.maskProperty.data)
+      } else {
+        this.maskProgramInfo && this.gl.deleteProgram(this.maskProgramInfo.program)
+        this.maskProgramInfo = undefined
+        this.maskBufferInfo = undefined
       }
-      this.maskProperty = Object.assign(this.maskProperty, mask)
-      this.maskBufferInfo = this.getMaskBufferInfo(this.gl, this.maskProperty.data)
       this.map.triggerRepaint()
     }
     return this
@@ -261,20 +244,21 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
 
   private loadTexture(map: mapboxgl.Map, gl: WebGLRenderingContext) {
     // 创建纹理
-    const filter = this.resampling === 'linear' ? gl.LINEAR : gl.NEAREST
-    const { data, metadata } = this.data
-    // 左下角坐标，所以需要将数据翻转一下
-    const imageData = getImageData(data, metadata, this.colorOption)
-    this.texture = twgl.createTexture(gl, {
-      width: metadata.ncols,
-      height: metadata.nrows,
-      src: imageData as number[],
-      minMag: filter,
-      flipY: 1,
-    })
+    const filter = this.option.resampling === 'nearest' ? gl.NEAREST : gl.LINEAR
 
-    this.loaded = true
-    map.triggerRepaint()
+    this.texture = twgl.createTexture(
+      gl,
+      {
+        src: this.option.url,
+        crossOrigin: this.option.crossOrigin,
+        minMag: filter,
+        flipY: 0,
+      },
+      () => {
+        this.loaded = true
+        map.triggerRepaint()
+      }
+    )
   }
 
   private getMaskBufferInfo(
@@ -289,8 +273,8 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
       let triangleStartIndex = 0
       for (let i = 0; i < polyCount; i++) {
         const coordinates = data.coordinates[i]
-        const flatten = earcut.flatten(coordinates)
-        const { vertices, holes, dimensions } = flatten
+        const flattened = flatten(coordinates)
+        const { vertices, holes, dimensions } = flattened
         const triangle = earcut(vertices, holes, dimensions)
         const triangleNew = triangle.map((item) => item + triangleStartIndex)
 
@@ -306,8 +290,8 @@ export default class GridLayer implements mapboxgl.CustomLayerInterface {
       }
     } else {
       // type: 'Polygon'
-      const flatten = earcut.flatten(data.coordinates)
-      const { vertices, holes, dimensions } = flatten
+      const flattened = flatten(data.coordinates)
+      const { vertices, holes, dimensions } = flattened
       positions = vertices
       triangles = earcut(vertices, holes, dimensions)
     }

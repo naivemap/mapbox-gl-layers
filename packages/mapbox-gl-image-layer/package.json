@@ -46,9 +46,10 @@
   },
   "dependencies": {
     "arrugator": "^1.0.1",
-    "compare-versions": "^6.0.0-rc.1",
-    "earcut": "^2.2.4",
-    "twgl.js": "^5.3.1"
+    "compare-versions": "^6.1.1",
+    "earcut": "^3.0.1",
+    "tinyqueue": "^3.0.0",
+    "twgl.js": "^5.5.4"
   },
   "devDependencies": {
     "@types/earcut": "^2.1.1",
