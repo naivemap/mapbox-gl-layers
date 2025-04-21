@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "lib": ["es2023", "DOM"],
     "declaration": true,
     "esModuleInterop": true,
     "strict": true,
